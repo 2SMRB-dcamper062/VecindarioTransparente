@@ -1,3 +1,8 @@
+import dotenv from "dotenv";
+
+dotenv.config({ path: ".env.local" });
+dotenv.config();
+
 import express, { Request, Response, NextFunction } from "express";
 import path from "path";
 import cors from "cors";
@@ -219,12 +224,30 @@ const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction):
 
 // Base Health check
 app.get("/api/health", (req, res) => {
+  const users = dbSource.getUsers();
   res.json({
     status: "online",
     database: isUsingMongoDB ? "MongoDB Atlas" : "Local JSON Store Fallback",
+    geminiConfigured: Boolean(process.env.GEMINI_API_KEY),
+    demoUsers: users.length,
     time: new Date().toISOString()
   });
 });
+
+// Resembrar base de datos local (solo desarrollo)
+if (process.env.NODE_ENV !== "production") {
+  app.post("/api/dev/seed", (req, res) => {
+    try {
+      dbSource.reseed();
+      res.json({
+        message: "Base de datos local resembrada con datos de demostración.",
+        users: dbSource.getUsers().map(u => ({ username: u.username, role: u.role, name: u.name }))
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+}
 
 // Auth / Register: Formulario de Registro Completo con Roles y Estados Estrictos
 app.post("/api/auth/register", async (req, res) => {

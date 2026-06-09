@@ -392,7 +392,7 @@ class LocalDB {
     };
 
     this.data = {
-      users: [userAdmin, userVecino1, userVecino2],
+      users: [userSuperAdmin, userAdmin, userVecino1, userVecino2],
       communities: [community],
       properties: [prop1, prop2, propPresidente],
       votes: [vote1, vote2, vote3],
@@ -403,6 +403,12 @@ class LocalDB {
     };
 
     this.save();
+  }
+
+  /** Restablece la base de datos local con datos de demostración. */
+  public reseed() {
+    this.seed();
+    console.log("Base de datos local resembrada correctamente.");
   }
 
   // API helper accessors
