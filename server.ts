@@ -10,6 +10,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import http from "http";
 import multer from "multer";
+import nodemailer from "nodemailer";
 import { WebSocketServer, WebSocket as WS } from "ws";
 import { createServer as createViteServer } from "vite";
 import { dbSource, User, Community, Property, Vote, Finance, Booking, CastVote, PropertyHistoryItem, Issue, PushSubscriptionItem } from "./src/db/localDb.js";
@@ -47,6 +48,52 @@ if (vapidKeys.publicKey && vapidKeys.privateKey) {
     vapidKeys.publicKey,
     vapidKeys.privateKey
   );
+}
+
+// Email configuration
+const EMAIL_HOST = process.env.EMAIL_HOST || "smtp.gmail.com";
+const EMAIL_PORT = Number(process.env.EMAIL_PORT) || 587;
+const EMAIL_USER = process.env.EMAIL_USER || "";
+const EMAIL_PASS = process.env.EMAIL_PASS || "";
+const EMAIL_FROM = process.env.EMAIL_FROM || "VecindarioTransparente <noreply@vecindariotransparente.es>";
+
+let transporter: nodemailer.Transporter | null = null;
+
+if (EMAIL_USER && EMAIL_PASS) {
+  transporter = nodemailer.createTransport({
+    host: EMAIL_HOST,
+    port: EMAIL_PORT,
+    secure: EMAIL_PORT === 465,
+    auth: {
+      user: EMAIL_USER,
+      pass: EMAIL_PASS
+    }
+  });
+  console.log("✅ Email service configured");
+} else {
+  console.log("⚠️ Email service not configured (missing EMAIL_USER or EMAIL_PASS)");
+}
+
+// Email helper function
+async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
+  if (!transporter) {
+    console.log("Email service not available, skipping email to:", to);
+    return false;
+  }
+
+  try {
+    await transporter.sendMail({
+      from: EMAIL_FROM,
+      to,
+      subject,
+      html
+    });
+    console.log("✅ Email sent to:", to);
+    return true;
+  } catch (error) {
+    console.error("❌ Failed to send email to:", to, error);
+    return false;
+  }
 }
 
 // Resilient Gemini Client configuration (Lazy loading to avoid startup crashes)
@@ -379,6 +426,68 @@ app.post("/api/auth/register", async (req, res) => {
     dbSource.getUsers().push(newUser);
     dbSource.save();
 
+    // Send email notifications
+    if (isNeighbor && initialStatus === "pending") {
+      // Send email to user about pending approval
+      const userEmailHtml = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #7c3aed;">Bienvenido a VecindarioTransparente</h2>
+          <p>Hola ${name},</p>
+          <p>Tu solicitud de unión a la comunidad <strong>${community.name}</strong> ha sido recibida correctamente.</p>
+          <p>Tu cuenta está actualmente en estado <strong>Pendiente de Aprobación</strong>. El administrador de tu bloque revisará tu solicitud y te notificará cuando sea aprobada.</p>
+          <p>Detalles de tu registro:</p>
+          <ul>
+            <li>Usuario: ${username}</li>
+            <li>Rol: ${requestedRole === 'owner' ? 'Propietario' : 'Inquilino'}</li>
+            <li>Propiedad: Bloque ${block || 'A'}, ${floor || '1º'} ${door || 'A'}</li>
+          </ul>
+          <p>Te notificaremos por email cuando tu cuenta sea activada.</p>
+          <p>Saludos,<br>El equipo de VecindarioTransparente</p>
+        </div>
+      `;
+      sendEmail(email, "Solicitud de unión a comunidad pendiente de aprobación", userEmailHtml);
+
+      // Send email to community admin about new pending user
+      const communityAdmins = dbSource.getUsers().filter(u => u.communityId === community._id && u.role === "admin");
+      communityAdmins.forEach(admin => {
+        const adminEmailHtml = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #7c3aed;">Nueva solicitud de unión a la comunidad</h2>
+            <p>Hola ${admin.name},</p>
+            <p>Un nuevo vecino ha solicitado unirse a la comunidad <strong>${community.name}</strong> y requiere tu aprobación.</p>
+            <p>Detalles del solicitante:</p>
+            <ul>
+              <li>Nombre: ${name}</li>
+              <li>Email: ${email}</li>
+              <li>Usuario: ${username}</li>
+              <li>Rol: ${requestedRole === 'owner' ? 'Propietario' : 'Inquilino'}</li>
+              <li>Propiedad: Bloque ${block || 'A'}, ${floor || '1º'} ${door || 'A'}</li>
+            </ul>
+            <p>Por favor, accede al panel de administración para aprobar o rechazar esta solicitud.</p>
+            <p>Saludos,<br>El equipo de VecindarioTransparente</p>
+          </div>
+        `;
+        sendEmail(admin.email, `Nueva solicitud de unión: ${name}`, adminEmailHtml);
+      });
+    } else {
+      // Send welcome email for auto-approved users
+      const welcomeEmailHtml = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #7c3aed;">¡Bienvenido a VecindarioTransparente!</h2>
+          <p>Hola ${name},</p>
+          <p>Tu cuenta ha sido creada exitosamente y ya está activa en la comunidad <strong>${community.name}</strong>.</p>
+          <p>Detalles de tu cuenta:</p>
+          <ul>
+            <li>Usuario: ${username}</li>
+            <li>Rol: ${requestedRole}</li>
+          </ul>
+          <p>Ya puedes acceder a todas las funcionalidades de la plataforma.</p>
+          <p>Saludos,<br>El equipo de VecindarioTransparente</p>
+        </div>
+      `;
+      sendEmail(email, "¡Bienvenido a VecindarioTransparente!", welcomeEmailHtml);
+    }
+
     // 5. Generate Access Token JWT
     const token = jwt.sign(
       { userId: newUser._id, username: newUser.username, role: newUser.role, communityId: newUser.communityId },
@@ -387,7 +496,7 @@ app.post("/api/auth/register", async (req, res) => {
     );
 
     res.status(201).json({
-      message: isNeighbor 
+      message: isNeighbor
         ? "¡Registro inicial completado! Su solicitud está en estado 'Pendiente' esperando aprobación del Administrador de su bloque."
         : "¡Administrador de comunidad registrado y activado exitosamente!",
       token,
@@ -552,6 +661,24 @@ app.put("/api/auth/profile", authenticateToken, async (req: AuthRequest, res) =>
       return;
     }
     userObj.passwordHash = await bcrypt.hash(newPassword, 10);
+
+    // Send email notification about password change
+    const passwordChangeEmailHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #7c3aed;">Tu contraseña ha sido cambiada</h2>
+        <p>Hola ${userObj.name},</p>
+        <p>Te confirmamos que tu contraseña de VecindarioTransparente ha sido cambiada exitosamente.</p>
+        <p>Si no solicitaste este cambio, por favor contacta inmediatamente con el soporte para asegurar la seguridad de tu cuenta.</p>
+        <p>Por tu seguridad, te recomendamos:</p>
+        <ul>
+          <li>Usar contraseñas únicas y complejas</li>
+          <li>No compartir tus credenciales con nadie</li>
+          <li>Cerrar sesión en dispositivos que no reconozcas</li>
+        </ul>
+        <p>Saludos,<br>El equipo de VecindarioTransparente</p>
+      </div>
+    `;
+    sendEmail(userObj.email, "Tu contraseña ha sido cambiada", passwordChangeEmailHtml);
   }
 
   if (name) userObj.name = name;
@@ -1247,17 +1374,39 @@ app.put("/api/users/:id/approve", authenticateToken, (req: AuthRequest, res) => 
     res.status(403).json({ error: "Se requieren permisos de administrador." });
     return;
   }
-  
+
   const { id } = req.params;
   const neighbor = dbSource.getUsers().find(u => u._id === id);
-  
+
   if (!neighbor) {
     res.status(404).json({ error: "Vecino no encontrado en la base de datos." });
     return;
   }
-  
+
   neighbor.status = "approved";
   dbSource.save();
+
+  // Send email notification to approved user
+  const community = dbSource.getCommunities().find(c => c._id === neighbor.communityId);
+  const approvalEmailHtml = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <h2 style="color: #7c3aed;">¡Tu cuenta ha sido aprobada!</h2>
+      <p>Hola ${neighbor.name},</p>
+      <p>¡Buenas noticias! Tu solicitud de unión a la comunidad <strong>${community?.name || 'tu comunidad'}</strong> ha sido aprobada.</p>
+      <p>Tu cuenta ahora está activa y puedes acceder a todas las funcionalidades de VecindarioTransparente:</p>
+      <ul>
+        <li>Consultar tus recibos y estado de cuenta</li>
+        <li>Participar en votaciones comunitarias</li>
+        <li>Reportar incidencias</li>
+        <li>Reservar zonas comunes</li>
+        <li>Ver las finanzas de la comunidad</li>
+      </ul>
+      <p>Ya puedes iniciar sesión en la plataforma.</p>
+      <p>Saludos,<br>El equipo de VecindarioTransparente</p>
+    </div>
+  `;
+  sendEmail(neighbor.email, "¡Tu cuenta ha sido aprobada!", approvalEmailHtml);
+
   res.json({ message: `¡Se ha activado y aprobado correctamente el ingreso de ${neighbor.name}!`, neighbor });
 });
 
@@ -1277,7 +1426,8 @@ app.post("/api/properties/mass-receipt", authenticateToken, async (req: AuthRequ
   try {
     const amt = Number(amount);
     const props = dbSource.getProperties().filter(p => p.communityId === req.user?.communityId);
-    
+    const community = dbSource.getCommunities().find(c => c._id === req.user?.communityId);
+
     props.forEach(p => {
       p.pendingAmount += amt;
       p.balanceStatus = "pendiente";
@@ -1288,9 +1438,33 @@ app.post("/api/properties/mass-receipt", authenticateToken, async (req: AuthRequ
         status: "pendiente"
       });
     });
-    
+
     dbSource.save();
-    
+
+    // Send email notifications to all property owners
+    props.forEach(p => {
+      const user = dbSource.getUsers().find(u => u._id === p.userId);
+      if (user && user.email) {
+        const massReceiptEmailHtml = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #7c3aed;">Nuevo recibo comunitario emitido</h2>
+            <p>Hola ${user.name},</p>
+            <p>Se ha emitido un nuevo recibo comunitario para la comunidad <strong>${community?.name || 'tu comunidad'}</strong>.</p>
+            <p>Detalles del recibo:</p>
+            <ul>
+              <li>Concepto: ${concept}</li>
+              <li>Importe: ${amt.toFixed(2)} €</li>
+              <li>Fecha: ${new Date().toISOString().split("T")[0]}</li>
+              <li>Tu propiedad: Bloque ${p.block}, ${p.floor} ${p.door}</li>
+            </ul>
+            <p>Este importe ha sido añadido a tu saldo pendiente. Por favor, revisa tu estado de cuenta en la plataforma.</p>
+            <p>Saludos,<br>El equipo de VecindarioTransparente</p>
+          </div>
+        `;
+        sendEmail(user.email, `Nuevo recibo comunitario: ${amt.toFixed(2)} €`, massReceiptEmailHtml);
+      }
+    });
+
     // Broadcast mass receipt notifications
     await sendPushToCommunity(
       req.user.communityId,
@@ -1298,7 +1472,7 @@ app.post("/api/properties/mass-receipt", authenticateToken, async (req: AuthRequ
       `Nuevo recibo comunitario de ${amt.toFixed(2)} €: "${concept}" cargado a todas las viviendas.`,
       "#recibos"
     );
-    
+
     res.json({ message: `Recibo general de ${amt.toFixed(2)} € emitido con éxito a las ${props.length} viviendas.` });
   } catch (err: any) {
     res.status(500).json({ error: "No se pudo realizar el cargo general: " + err.message });
