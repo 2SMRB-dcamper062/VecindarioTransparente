@@ -1,0 +1,6 @@
+{
+  "name": "VecindarioTransparente",
+  "description": "Plataforma para la autogestión, transparencia y votación digital de comunidades de vecinos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
