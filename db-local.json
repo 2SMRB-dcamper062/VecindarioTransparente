@@ -60,10 +60,12 @@
       "name": "david camacho",
       "email": "fotografiacamacho2@gmail.com",
       "passwordHash": "$2b$10$6hhBlv9ViQ.CPCocj286Mu4neIV2noHmhh2rhEy95E9HXeRZRq5Ga",
-      "avatarUrl": "https://api.dicebear.com/7.x/bottts/svg?seed=david",
+      "avatarUrl": "https://api.dicebear.com/7.x/bottts/svg?seed=altljliq",
       "role": "owner",
       "status": "approved",
-      "communityId": "com_alameda"
+      "communityId": "com_alameda",
+      "bio": "",
+      "phone": ""
     }
   ],
   "communities": [
