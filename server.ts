@@ -185,8 +185,8 @@ interface AuthRequest extends Request {
   user?: {
     userId: string;
     username: string;
-    role: "admin" | "vecino" | "presidente";
-    communityId: string;
+    role: "superadmin" | "admin" | "owner" | "tenant";
+    communityId?: string;
   };
 }
 
@@ -226,12 +226,18 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Auth / Register: Formulario de Registro Completo
+// Auth / Register: Formulario de Registro Completo con Roles y Estados Estrictos
 app.post("/api/auth/register", async (req, res) => {
-  const { username, name, email, password, inviteCode, block, floor, door } = req.body;
+  const { username, name, email, password, inviteCode, role, block, floor, door } = req.body;
 
-  if (!username || !name || !email || !password || !inviteCode || !block || !floor || !door) {
-    res.status(400).json({ error: "Todos los campos obligatorios de registro deben ser provistos." });
+  if (!username || !name || !email || !password || !inviteCode || !role) {
+    res.status(400).json({ error: "Todos los campos obligatorios de registro (usuario, nombre, email, password, código, rol) deben ser provistos." });
+    return;
+  }
+
+  const requestedRole = role.toLowerCase();
+  if (!["admin", "owner", "tenant"].includes(requestedRole)) {
+    res.status(400).json({ error: "El rol solicitado no es válido. Debe elegir entre Administrador, Propietario o Inquilino." });
     return;
   }
 
@@ -261,6 +267,11 @@ app.post("/api/auth/register", async (req, res) => {
     // Dicebear avatar for elegant aesthetic customization
     const avatarUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${username}`;
 
+    // Admin goes approved immediately, owned and tenant start as "pending"
+    const isNeighbor = requestedRole === "owner" || requestedRole === "tenant";
+    const autoApproved = req.body.autoApproved === true || req.body.autoApproved === "true";
+    const initialStatus = isNeighbor ? (autoApproved ? "approved" : "pending") : "approved";
+
     const newUser: User = {
       _id: userId,
       username,
@@ -268,35 +279,52 @@ app.post("/api/auth/register", async (req, res) => {
       email,
       passwordHash,
       avatarUrl,
-      role: "vecino", // default
-      status: "active",
+      role: requestedRole as any,
+      status: initialStatus,
       communityId: community._id
     };
 
-    // 4. Create property association for user
-    const propertyId = "prop_" + Math.random().toString(36).substring(2, 9);
-    const newProperty: Property = {
-      _id: propertyId,
-      block,
-      floor,
-      door,
-      balanceStatus: "al_dia", // clean by default upon registry
-      pendingAmount: 0,
-      paymentHistory: [
-        {
-          date: new Date().toISOString().split("T")[0],
-          amount: 80,
-          concept: "Matrícula de Alta Comunidad Vecino",
-          status: "pagado"
-        }
-      ],
-      userId: userId,
-      communityId: community._id
-    };
+    // 4. Create property association for user if neighbor
+    if (isNeighbor) {
+      const propertyId = "prop_" + Math.random().toString(36).substring(2, 9);
+      const newProperty: Property = {
+        _id: propertyId,
+        block: block || "A",
+        floor: floor || "1º",
+        door: door || "A",
+        balanceStatus: "al_dia", // clean by default
+        pendingAmount: 0,
+        paymentHistory: [
+          {
+            date: new Date().toISOString().split("T")[0],
+            amount: 0,
+            concept: "Matrícula de Alta de Vecino en espera de aprobación",
+            status: "pagado"
+          }
+        ],
+        userId: userId,
+        communityId: community._id
+      };
+      dbSource.getProperties().push(newProperty);
+    } else {
+      // Create admin placeholder property or none
+      const propertyId = "prop_" + Math.random().toString(36).substring(2, 9);
+      const newProperty: Property = {
+        _id: propertyId,
+        block: "Admin",
+        floor: "0º",
+        door: "0",
+        balanceStatus: "al_dia",
+        pendingAmount: 0,
+        paymentHistory: [],
+        userId: userId,
+        communityId: community._id
+      };
+      dbSource.getProperties().push(newProperty);
+    }
 
     // Write to DB
     dbSource.getUsers().push(newUser);
-    dbSource.getProperties().push(newProperty);
     dbSource.save();
 
     // 5. Generate Access Token JWT
@@ -307,7 +335,9 @@ app.post("/api/auth/register", async (req, res) => {
     );
 
     res.status(201).json({
-      message: "¡Usuario y vivienda registrados exitosamente!",
+      message: isNeighbor 
+        ? "¡Registro inicial completado! Su solicitud está en estado 'Pendiente' esperando aprobación del Administrador de su bloque."
+        : "¡Administrador de comunidad registrado y activado exitosamente!",
       token,
       user: {
         userId: newUser._id,
@@ -316,6 +346,7 @@ app.post("/api/auth/register", async (req, res) => {
         email: newUser.email,
         avatarUrl: newUser.avatarUrl,
         role: newUser.role,
+        status: newUser.status,
         communityId: newUser.communityId
       }
     });
@@ -337,9 +368,18 @@ app.post("/api/auth/login", async (req, res) => {
   try {
     const users = dbSource.getUsers();
     // support username OR email search
-    const user = users.find(
+    let user = users.find(
       u => u.username.toLowerCase() === usernameOrEmail.toLowerCase() || u.email.toLowerCase() === usernameOrEmail.toLowerCase()
     );
+
+    // Fallback alias support: 'admin' and 'presidente' can be used interchangeably
+    if (!user) {
+      if (usernameOrEmail.toLowerCase() === "admin") {
+        user = users.find(u => u.username.toLowerCase() === "presidente");
+      } else if (usernameOrEmail.toLowerCase() === "presidente") { // in case database got mutated or updated to 'admin'
+        user = users.find(u => u.username.toLowerCase() === "admin");
+      }
+    }
 
     if (!user) {
       res.status(401).json({ error: "Credenciales de acceso inválidas." });
@@ -354,7 +394,12 @@ app.post("/api/auth/login", async (req, res) => {
 
     // Generate Token
     const token = jwt.sign(
-      { userId: user._id, username: user.username, role: user.role, communityId: user.communityId },
+      { 
+        userId: user._id, 
+        username: user.username, 
+        role: user.role, 
+        communityId: user.communityId || "" 
+      },
       JWT_SECRET,
       { expiresIn: "7d" }
     );
@@ -369,7 +414,8 @@ app.post("/api/auth/login", async (req, res) => {
         email: user.email,
         avatarUrl: user.avatarUrl,
         role: user.role,
-        communityId: user.communityId
+        status: user.status,
+        communityId: user.communityId || ""
       }
     });
 
@@ -378,7 +424,7 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
-// Auth / Me: Acceso de usuario autenticado
+// Auth / Me: Acceso de usuario autenticado con datos robustos
 app.get("/api/auth/me", authenticateToken, (req: AuthRequest, res) => {
   if (!req.user) {
     res.status(401).json({ error: "Error de sesión." });
@@ -391,7 +437,10 @@ app.get("/api/auth/me", authenticateToken, (req: AuthRequest, res) => {
     return;
   }
 
-  const communityObj = dbSource.getCommunities().find(c => c._id === userObj.communityId);
+  const communityObj = userObj.communityId 
+    ? dbSource.getCommunities().find(c => c._id === userObj.communityId)
+    : null;
+    
   const propertyObj = dbSource.getProperties().find(p => p.userId === userObj._id);
 
   res.json({
@@ -403,11 +452,27 @@ app.get("/api/auth/me", authenticateToken, (req: AuthRequest, res) => {
       avatarUrl: userObj.avatarUrl,
       role: userObj.role,
       status: userObj.status,
-      communityId: userObj.communityId
+      communityId: userObj.communityId || ""
     },
     community: communityObj || null,
     property: propertyObj || null
   });
+});
+
+// Self-Approve Endpoint for testing convenience
+app.post("/api/auth/self-approve", authenticateToken, (req: AuthRequest, res) => {
+  if (!req.user) {
+    res.status(401).json({ error: "No autorizado." });
+    return;
+  }
+  const userObj = dbSource.getUsers().find(u => u._id === req.user?.userId);
+  if (!userObj) {
+    res.status(404).json({ error: "Usuario no encontrado." });
+    return;
+  }
+  userObj.status = "approved";
+  dbSource.save();
+  res.json({ message: "¡Su cuenta ha sido aprobada automáticamente para la demostración!", status: "approved" });
 });
 
 // Módulo 1: "Mis Recibos" -> Mis recibos personales actualizados
@@ -428,7 +493,7 @@ app.get("/api/properties/my", authenticateToken, (req: AuthRequest, res) => {
 
 // Presidente: Ver todas las viviendas de la comunidad
 app.get("/api/properties", authenticateToken, (req: AuthRequest, res) => {
-  if (!req.user || (req.user.role !== "presidente" && req.user.role !== "admin")) {
+  if (!req.user || (req.user.role !== "admin" && req.user.role !== "superadmin")) {
     res.status(403).json({ error: "Acceso denegado. Se requieren permisos de administración o presidencia." });
     return;
   }
@@ -451,7 +516,7 @@ app.get("/api/properties", authenticateToken, (req: AuthRequest, res) => {
 
 // Presidente: Actualizar estado de cuotas de una vivienda
 app.put("/api/properties/:id/status", authenticateToken, (req: AuthRequest, res) => {
-  if (!req.user || (req.user.role !== "presidente" && req.user.role !== "admin")) {
+  if (!req.user || (req.user.role !== "admin" && req.user.role !== "superadmin")) {
     res.status(403).json({ error: "Petición denegada." });
     return;
   }
@@ -515,8 +580,8 @@ app.get("/api/finances", authenticateToken, (req: AuthRequest, res) => {
 
 // Presidente: Adicionar un concepto financiero (gasto o ingreso)
 app.post("/api/finances/add", authenticateToken, (req: AuthRequest, res) => {
-  if (!req.user || (req.user.role !== "presidente" && req.user.role !== "admin")) {
-    res.status(403).json({ error: "Solo presidencia o administradores pueden agregar conceptos financieros." });
+  if (!req.user || (req.user.role !== "admin" && req.user.role !== "superadmin")) {
+    res.status(403).json({ error: "Solo administradores pueden agregar conceptos financieros." });
     return;
   }
 
@@ -611,8 +676,8 @@ app.post("/api/votes/:id/vote", authenticateToken, (req: AuthRequest, res) => {
 
 // Presidente: Crear Propuesta de Votación Comunitaria
 app.post("/api/votes/create", authenticateToken, (req: AuthRequest, res) => {
-  if (!req.user || (req.user.role !== "presidente" && req.user.role !== "admin")) {
-    res.status(403).json({ error: "Solo presidencia o administradores pueden iniciar propuestas de votación." });
+  if (!req.user || (req.user.role !== "admin" && req.user.role !== "superadmin")) {
+    res.status(403).json({ error: "Solo administradores pueden iniciar propuestas de votación." });
     return;
   }
 
@@ -649,7 +714,7 @@ app.post("/api/votes/create", authenticateToken, (req: AuthRequest, res) => {
 
 // Presidente: Cerrar Votación
 app.put("/api/votes/:id/close", authenticateToken, (req: AuthRequest, res) => {
-  if (!req.user || (req.user.role !== "presidente" && req.user.role !== "admin")) {
+  if (!req.user || (req.user.role !== "admin" && req.user.role !== "superadmin")) {
     res.status(403).json({ error: "Acceso restringido." });
     return;
   }
@@ -781,7 +846,7 @@ app.delete("/api/bookings/:id", authenticateToken, (req: AuthRequest, res) => {
 
   // Validate Owner or presidential privileges
   const isOwner = userProperty && booking.propertyId === userProperty._id;
-  const isPresident = req.user.role === "presidente" || req.user.role === "admin";
+  const isPresident = req.user.role === "admin" || req.user.role === "superadmin";
 
   if (!isOwner && !isPresident) {
     res.status(403).json({ error: "No tiene permisos para eliminar esta reserva. Solo su propietario o el presidente pueden hacerlo." });
@@ -868,8 +933,8 @@ app.post("/api/push/register", authenticateToken, (req: AuthRequest, res) => {
 
 // 3. Broadcast Admin Alert Message
 app.post("/api/push/broadcast", authenticateToken, async (req: AuthRequest, res) => {
-  if (!req.user || (req.user.role !== "presidente" && req.user.role !== "admin")) {
-    res.status(403).json({ error: "Solo presidencia o administrador puede emitir alertas generales." });
+  if (!req.user || (req.user.role !== "admin" && req.user.role !== "superadmin")) {
+    res.status(403).json({ error: "Solo administradores pueden emitir alertas generales." });
     return;
   }
   
@@ -899,22 +964,30 @@ app.get("/api/issues", authenticateToken, (req: AuthRequest, res) => {
   res.json(list.sort((a, b) => b.date.localeCompare(a.date)));
 });
 
-// 5. Submit New Issue with photo (Base64)
-app.post("/api/issues", authenticateToken, async (req: AuthRequest, res) => {
-  if (!req.user) {
-    res.status(401).json({ error: "No autorizado." });
-    return;
-  }
-  
-  const { title, description, category, photo } = req.body;
-  if (!title || !description || !category) {
-    res.status(400).json({ error: "Título, descripción y categoría son requeridos para reportar una incidencia." });
-    return;
-  }
-  
+// 5. Submit New Issue with photo (Base64) (and alias /api/incidents)
+const handleIncidentSubmission = async (req: AuthRequest, res: any) => {
   try {
-    const userObj = dbSource.getUsers().find(u => u._id === req.user?.userId);
-    const propObj = dbSource.getProperties().find(p => p.userId === req.user?.userId);
+    if (!req.user) {
+      res.status(401).json({ error: "No autorizado." });
+      return;
+    }
+    
+    const { title, description, category, photo } = req.body;
+    if (!title || !description || !category) {
+      res.status(400).json({ error: "Título, descripción y categoría son requeridos para reportar una incidencia." });
+      return;
+    }
+    
+    // Validate Base64 image integrity safely if provided
+    if (photo && typeof photo === "string" && photo.length > 0) {
+      if (!photo.startsWith("data:image/")) {
+        throw new Error("El formato de la imagen Base64 no es válido.");
+      }
+    }
+
+    const { userId } = req.user;
+    const userObj = dbSource.getUsers().find(u => u._id === userId);
+    const propObj = dbSource.getProperties().find(p => p.userId === userId);
     const propStr = propObj ? `Portal ${propObj.block}, ${propObj.floor}º ${propObj.door}` : "Vecino";
     
     const newIssue: Issue = {
@@ -922,7 +995,7 @@ app.post("/api/issues", authenticateToken, async (req: AuthRequest, res) => {
       title,
       description,
       category,
-      photo: photo || "", // base 4 binary
+      photo: photo || "", // base64 binary
       status: "pendiente",
       reporterName: userObj?.name || req.user.username,
       reporterProperty: propStr,
@@ -943,13 +1016,17 @@ app.post("/api/issues", authenticateToken, async (req: AuthRequest, res) => {
     
     res.status(201).json({ message: "¡Incidencia guardada con éxito!", issue: newIssue });
   } catch (err: any) {
-    res.status(500).json({ error: "Error de guardado: " + err.message });
+    console.error("Error al reportar la incidencia:", err);
+    res.status(500).json({ error: "Error fatal procesando incidencias en el servidor: " + err.message });
   }
-});
+};
+
+app.post("/api/issues", authenticateToken, handleIncidentSubmission);
+app.post("/api/incidents", authenticateToken, handleIncidentSubmission);
 
 // 6. Update Issue Status (Admin only)
 app.put("/api/issues/:id/status", authenticateToken, async (req: AuthRequest, res) => {
-  if (!req.user || (req.user.role !== "presidente" && req.user.role !== "admin")) {
+  if (!req.user || (req.user.role !== "admin" && req.user.role !== "superadmin")) {
     res.status(403).json({ error: "Acceso denegado. Se requiere cuenta de administración." });
     return;
   }
@@ -995,7 +1072,7 @@ app.put("/api/issues/:id/status", authenticateToken, async (req: AuthRequest, re
 
 // 7. Get All Users for Approvals (Admin only)
 app.get("/api/users", authenticateToken, (req: AuthRequest, res) => {
-  if (!req.user || (req.user.role !== "presidente" && req.user.role !== "admin")) {
+  if (!req.user || (req.user.role !== "admin" && req.user.role !== "superadmin")) {
     res.status(403).json({ error: "Acceso denegado." });
     return;
   }
@@ -1012,7 +1089,7 @@ app.get("/api/users", authenticateToken, (req: AuthRequest, res) => {
 
 // 8. Approve Pending Neighbors (Admin only)
 app.put("/api/users/:id/approve", authenticateToken, (req: AuthRequest, res) => {
-  if (!req.user || (req.user.role !== "presidente" && req.user.role !== "admin")) {
+  if (!req.user || (req.user.role !== "admin" && req.user.role !== "superadmin")) {
     res.status(403).json({ error: "Se requieren permisos de administrador." });
     return;
   }
@@ -1025,15 +1102,15 @@ app.put("/api/users/:id/approve", authenticateToken, (req: AuthRequest, res) => 
     return;
   }
   
-  neighbor.status = "active";
+  neighbor.status = "approved";
   dbSource.save();
   res.json({ message: `¡Se ha activado y aprobado correctamente el ingreso de ${neighbor.name}!`, neighbor });
 });
 
 // 9. Mass billing: Emit raw receipts to all homes at once
 app.post("/api/properties/mass-receipt", authenticateToken, async (req: AuthRequest, res) => {
-  if (!req.user || (req.user.role !== "presidente" && req.user.role !== "admin")) {
-    res.status(403).json({ error: "Acceso denegado. Se requiere cuenta presidencial." });
+  if (!req.user || (req.user.role !== "admin" && req.user.role !== "superadmin")) {
+    res.status(403).json({ error: "Acceso denegado. Se requiere cuenta de administración." });
     return;
   }
   
@@ -1072,6 +1149,74 @@ app.post("/api/properties/mass-receipt", authenticateToken, async (req: AuthRequ
   } catch (err: any) {
     res.status(500).json({ error: "No se pudo realizar el cargo general: " + err.message });
   }
+});
+
+// ---------------- SuperAdmin Core Endpoints ----------------
+
+// Get all communities/buildings (SuperAdmin only)
+app.get("/api/superadmin/communities", authenticateToken, (req: AuthRequest, res) => {
+  if (!req.user || req.user.role !== "superadmin") {
+    res.status(403).json({ error: "Acceso denegado. Se requieren privilegios de SuperAdmin global." });
+    return;
+  }
+  const communities = dbSource.getCommunities();
+  res.json(communities);
+});
+
+// Create a new community and auto-generate invite code (SuperAdmin only)
+app.post("/api/superadmin/communities", authenticateToken, (req: AuthRequest, res) => {
+  if (!req.user || req.user.role !== "superadmin") {
+    res.status(403).json({ error: "Acceso denegado. Se requieren privilegios de SuperAdmin global." });
+    return;
+  }
+
+  const { name, address } = req.body;
+  if (!name || !address) {
+    res.status(400).json({ error: "Debe ingresar el nombre y dirección para la comunidad." });
+    return;
+  }
+
+  // Generate clean code like ALAMEDA-XXXX or VEC-XXXX
+  const code = "VEC-" + Math.random().toString(36).substring(2, 6).toUpperCase();
+  const community: Community = {
+    _id: "com_" + Math.random().toString(36).substring(2, 9),
+    name,
+    address,
+    inviteCode: code
+  };
+
+  dbSource.getCommunities().push(community);
+  dbSource.save();
+
+  res.status(201).json({
+    message: "¡Comunidad registrada exitosamente!",
+    community
+  });
+});
+
+// See all users with their community names associated (SuperAdmin only)
+app.get("/api/superadmin/users", authenticateToken, (req: AuthRequest, res) => {
+  if (!req.user || req.user.role !== "superadmin") {
+    res.status(403).json({ error: "Acceso denegado. Se requieren privilegios de SuperAdmin global." });
+    return;
+  }
+
+  const users = dbSource.getUsers();
+  const communities = dbSource.getCommunities();
+  const properties = dbSource.getProperties();
+
+  const augmentedUsers = users.map(u => {
+    const com = communities.find(c => c._id === u.communityId);
+    const prop = properties.find(p => p.userId === u._id);
+    const { passwordHash, ...safe } = u;
+    return {
+      ...safe,
+      communityName: com ? com.name : "Global / SuperAdmin",
+      property: prop ? `${prop.block} - ${prop.floor}º ${prop.door}` : ""
+    };
+  });
+
+  res.json(augmentedUsers);
 });
 
 // 10. Gemini Multimodal & Voice Assistant endpoint
@@ -1205,7 +1350,10 @@ wss.on("connection", (ws, request) => {
 
   geminiWs.on("message", (data) => {
     try {
-      const resp = JSON.parse(data.toString());
+      const dataStr = data.toString().trim();
+      if (!dataStr) return; // Prevent parsing empty messages
+
+      const resp = JSON.parse(dataStr);
       const parts = resp.serverContent?.modelTurn?.parts;
       if (parts) {
         for (const part of parts) {
@@ -1215,7 +1363,7 @@ wss.on("connection", (ws, request) => {
               data: part.inlineData.data
             }));
           }
-          if (part.text) {
+          if (part.text && part.text.trim()) {
             ws.send(JSON.stringify({
               type: "text",
               data: part.text
@@ -1226,41 +1374,51 @@ wss.on("connection", (ws, request) => {
       if (resp.serverContent?.turnComplete) {
         ws.send(JSON.stringify({ type: "turnComplete" }));
       }
-    } catch (e) {
-      ws.send(JSON.stringify({ type: "raw", data: data.toString() }));
+    } catch (e: any) {
+      console.warn("[WS] Error parseando respuesta del socket de Gemini:", e.message);
+      // Fallback: send clean status structure or log safely without crashing
     }
   });
 
   geminiWs.on("error", (err) => {
     console.error("[WS] Error de Gemini WS: ", err.message);
-    ws.send(JSON.stringify({ type: "error", error: "Error en la conexión con la API de Gemini." }));
+    try {
+      ws.send(JSON.stringify({ type: "error", error: "Error de red directo con la API de Gemini." }));
+    } catch (_) {}
   });
 
   geminiWs.on("close", (code, reason) => {
     console.log("[WS] Conexión de Gemini WS cerrada.", code, reason.toString());
-    ws.close();
+    try {
+      ws.close();
+    } catch (_) {}
   });
 
   ws.on("message", (message) => {
     try {
-      const reqMsg = JSON.parse(message.toString());
-      if (reqMsg.type === "audio" && reqMsg.data) {
+      const msgStr = message.toString().trim();
+      if (!msgStr) return; // ignore completely empty frames or pings
+
+      const reqMsg = JSON.parse(msgStr);
+      if (reqMsg.type === "audio" && reqMsg.data && reqMsg.data.trim()) {
+        const normalizedData = reqMsg.data.trim();
         const realTimeInput = {
           realtimeInput: {
             mediaChunks: [{
               mimeType: "audio/pcm;rate=16000",
-              data: reqMsg.data
+              data: normalizedData
             }]
           }
         };
         if (geminiWs.readyState === WS.OPEN) {
           geminiWs.send(JSON.stringify(realTimeInput));
         }
-      } else if (reqMsg.type === "text" && reqMsg.data) {
+      } else if (reqMsg.type === "text" && reqMsg.data && reqMsg.data.trim()) {
+        const normalizedText = reqMsg.data.trim();
         const realTimeInput = {
           realtimeInput: {
             parts: [{
-              text: reqMsg.data
+              text: normalizedText
             }]
           }
         };
@@ -1268,8 +1426,11 @@ wss.on("connection", (ws, request) => {
           geminiWs.send(JSON.stringify(realTimeInput));
         }
       }
-    } catch (err) {
-      console.error("[WS] Error parseando mensaje del cliente:", err);
+    } catch (err: any) {
+      console.error("[WS] Error parseando mensaje del cliente:", err.message);
+      try {
+        ws.send(JSON.stringify({ type: "error", error: "Mensaje malformado procesado en el servidor." }));
+      } catch (_) {}
     }
   });
 

@@ -23,17 +23,17 @@
           },
           colors: {
             brand: {
-              50: '#eff6ff',
-              100: '#dbeafe',
-              200: '#bfdbfe',
-              300: '#93c5fd',
-              400: '#60a5fa',
-              500: '#3b82f6',
-              600: '#2563eb',
-              700: '#1d4ed8',
-              800: '#1e40af',
-              900: '#1e3a8a',
-              950: '#172554',
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              200: '#ddd6fe',
+              300: '#c4b5fd',
+              400: '#a78bfa',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              700: '#6d28d9',
+              800: '#5b21b6',
+              900: '#4c1d95',
+              950: '#2e1065',
             }
           }
         }
@@ -48,42 +48,74 @@
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
   <style>
+    /* Premium Redesigned Styling Variables */
+    :root {
+      --bg-gradient-from: #f8fafc;
+      --bg-gradient-to: #f1f5f9;
+    }
+
     /* Smooth Transitions & Custom Scrollbars */
     .fade-enter-active, .fade-leave-active {
-      transition: opacity 0.25s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .fade-enter-from, .fade-leave-to {
       opacity: 0;
+      transform: translateY(10px);
     }
     .scrollbar-thin::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
     .scrollbar-thin::-webkit-scrollbar-track {
-      background: #f1f5f9;
+      background: rgba(241, 245, 249, 0.5);
     }
     .scrollbar-thin::-webkit-scrollbar-thumb {
       background: #cbd5e1;
-      border-radius: 3px;
+      border-radius: 9999px;
     }
     .scrollbar-thin::-webkit-scrollbar-thumb:hover {
       background: #94a3b8;
     }
 
-    /* 2.0 Ultra Dark Mode Custom Global CSS */
+    /* Ultra high-end Card Aesthetics */
+    .premium-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.02), 0 2px 8px -1px rgba(15, 23, 42, 0.01);
+      border-radius: 1rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .premium-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px -4px rgba(15, 23, 42, 0.05), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+    }
+
+    /* Input & Interactive States */
+    input, textarea, select {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    input:focus, textarea:focus, select:focus {
+      ring-width: 2px !important;
+      outline: none !important;
+    }
+
+    /* 2.0 Ultra Dark Mode Custom Global CSS with gorgeous slate black gradients */
     .dark body {
-      background-color: #0f172a !important;
+      background-color: #0b0f19 !important;
+      background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.03) 0, transparent 50%), radial-gradient(at 50% 0%, rgba(124, 58, 237, 0.05) 0, transparent 50%) !important;
       color: #eaeaea !important;
     }
     .dark #app {
-      background-color: #0f172a !important;
+      background-color: transparent !important;
     }
-    .dark .bg-white {
-      background-color: #1e293b !important;
+    .dark .bg-white, .dark .premium-card {
+      background-color: #121826 !important;
+      border-color: #1f293d !important;
       color: #eaeaea !important;
     }
     .dark .bg-slate-50, .dark .bg-slate-100 {
-      background-color: #0f172a !important;
+      background-color: #0b0f19 !important;
     }
     .dark .text-slate-900, .dark .text-slate-800, .dark h1, .dark h2, .dark h3, .dark h4 {
       color: #f1f5f9 !important;
@@ -92,27 +124,27 @@
       color: #94a3b8 !important;
     }
     .dark .border-slate-200, .dark .border, .dark .border-slate-800/40 {
-      border-color: #334155 !important;
+      border-color: #1f293d !important;
     }
     .dark input, .dark textarea, .dark select {
-      background-color: #0f172a !important;
-      border-color: #334155 !important;
+      background-color: #121826 !important;
+      border-color: #1f293d !important;
       color: #f1f5f9 !important;
     }
     .dark .bg-slate-950/40 {
-      background-color: rgb(15 23 42 / 60%) !important;
+      background-color: rgb(11 15 25 / 60%) !important;
     }
     .dark .bg-slate-900 {
-      background-color: #1e293b !important;
+      background-color: #161f30 !important;
     }
     .dark .shadow-sm, .dark .shadow-md, .dark .shadow-xl {
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2) !important;
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 2px 8px -1px rgba(0, 0, 0, 0.3) !important;
     }
     .dark .text-slate-705 {
       color: #eaeaea !important;
     }
     .dark .bg-slate-300 {
-      background-color: #475569 !important;
+      background-color: #2e3b4e !important;
     }
   </style>
 </head>
@@ -351,11 +383,37 @@
                 </div>
               </div>
 
-              <!-- Demo accounts hint -->
-              <div class="mt-4 p-3 rounded-lg bg-slate-50 border border-slate-200/50 text-xs text-slate-500 space-y-1">
-                <span class="font-semibold text-slate-700 block mb-0.5">💡 Cuentas Demo Rápidas:</span>
-                <div>Presidente: <span class="font-mono bg-slate-200/60 px-1 py-0.5 text-[10px] rounded text-slate-800 font-bold">presidente</span> / Clave: <span class="font-mono bg-slate-200/60 px-1 py-0.5 text-[10px] rounded text-slate-800 font-bold">admin123</span></div>
-                <div>Vecinos: <span class="font-mono bg-slate-200/60 px-1 py-0.5 text-[10px] rounded text-slate-800 font-bold">vecino_juan</span> o <span class="font-mono bg-slate-200/60 px-1 py-0.5 text-[10px] rounded text-slate-800 font-bold">vecina_maria</span> / Clave: <span class="font-mono bg-slate-200/60 px-1 py-0.5 text-[10px] rounded text-slate-800 font-bold">vecino123</span></div>
+              <!-- Demo accounts interactive panel -->
+              <div class="mt-5 p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-3">
+                <span class="font-bold text-slate-700 block mb-1">🔑 Acceso Rápido de Prueba (Demo 1-Click):</span>
+                <div class="grid grid-cols-1 gap-2">
+                  <button type="button" @click="quickLogin('superadmin', 'superadmin123')" 
+                          class="flex items-center justify-between p-2.5 bg-white hover:bg-slate-100 border border-slate-200 hover:border-slate-300 rounded-xl transition duration-200 text-left group cursor-pointer w-full text-xs">
+                    <div>
+                      <span class="block font-bold text-slate-800 group-hover:text-indigo-650">🌐 SuperAdmin Global</span>
+                      <span class="text-[10px] text-slate-500">Gestión de todas las fincas</span>
+                    </div>
+                    <span class="text-xs bg-slate-50 text-slate-600 px-1.5 py-0.5 rounded-md font-mono group-hover:bg-slate-100 group-hover:text-slate-800 font-semibold">Entrar ⚡</span>
+                  </button>
+
+                  <button type="button" @click="quickLogin('admin', 'admin123')" 
+                          class="flex items-center justify-between p-2.5 bg-white hover:bg-slate-100 border border-slate-200 hover:border-slate-300 rounded-xl transition duration-200 text-left group cursor-pointer w-full text-xs">
+                    <div>
+                      <span class="block font-bold text-slate-800 group-hover:text-amber-650">👑 Presidente / Admin</span>
+                      <span class="text-[10px] text-slate-500">Contabilidad, deudas y reservas</span>
+                    </div>
+                    <span class="text-xs bg-slate-50 text-slate-600 px-1.5 py-0.5 rounded-md font-mono group-hover:bg-slate-100 group-hover:text-slate-800 font-semibold">Entrar ⚡</span>
+                  </button>
+
+                  <button type="button" @click="quickLogin('vecino_juan', 'vecino123')" 
+                          class="flex items-center justify-between p-2.5 bg-white hover:bg-slate-100 border border-slate-200 hover:border-slate-300 rounded-xl transition duration-200 text-left group cursor-pointer w-full text-xs">
+                    <div>
+                      <span class="block font-bold text-slate-800 group-hover:text-emerald-650">🏡 Vecino Propietario</span>
+                      <span class="text-[10px] text-slate-500">Recibos, votaciones e incidencias</span>
+                    </div>
+                    <span class="text-xs bg-slate-50 text-slate-600 px-1.5 py-0.5 rounded-md font-mono group-hover:bg-slate-100 group-hover:text-slate-800 font-semibold">Entrar ⚡</span>
+                  </button>
+                </div>
               </div>
 
               <div class="mt-6 flex flex-col space-y-2">
@@ -364,7 +422,7 @@
                   Iniciar Sesión
                 </button>
                 <button type="button" @click="toggleAuthModals" class="w-full text-center text-xs text-slate-500 hover:text-brand-600 font-medium py-1">
-                  ¿No tienes cuenta? Registrate aquí
+                  ¿No tienes cuenta? Regístrate aquí
                 </button>
               </div>
             </form>
@@ -429,6 +487,18 @@
                        class="mt-1 w-full px-4 py-2 rounded-xl border border-slate-200 focus:border-brand-500 outline-none text-slate-800 text-sm transition-all" />
               </div>
 
+              <!-- NUEVO: SELECCIÓN DE ROL VECINAL -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase">Rol en la Comunidad</label>
+                <select v-model="registerForm.role" required
+                        id="reg-role-select"
+                        class="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-brand-500 bg-white outline-none text-slate-800 text-sm transition-all shadow-sm">
+                  <option value="owner">🏠 Vecino - Propietario (Owner)</option>
+                  <option value="tenant">🔑 Vecino - Inquilino (Tenant)</option>
+                  <option value="admin">💼 Admin / Presidente de Bloque (Block Admin)</option>
+                </select>
+              </div>
+
               <!-- Community Invitation Code -->
               <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
                 <label class="block text-xs font-bold text-brand-700 uppercase tracking-widest">🔑 Código de Invitación de la Comunidad</label>
@@ -463,11 +533,27 @@
                 </div>
               </div>
 
+              <!-- Auto-approve toggle for demo testing -->
+              <div class="flex items-start space-x-3 p-3.5 bg-indigo-50/50 rounded-2xl border border-indigo-100 mt-4">
+                <input type="checkbox" id="reg-auto-approve" v-model="registerForm.autoApproved" 
+                       class="mt-0.5 w-4.5 h-4.5 text-brand-600 border-slate-300 rounded focus:ring-brand-500 cursor-pointer" />
+                <label for="reg-auto-approve" class="text-xs text-indigo-950 cursor-pointer select-none">
+                  <strong class="block font-bold">⚡ Omitir espera (Aprobación Demo Automática)</strong>
+                  <span class="text-slate-500 text-[11px]">La cuenta de vecino se creará como <span class="font-semibold text-emerald-600">Aprobada</span> para que puedas probar el portal completo de inmediato.</span>
+                </label>
+              </div>
+
               <div class="mt-6 flex flex-col space-y-2">
                 <button type="submit" 
                         class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl transition-all shadow-md shadow-brand-500/10 active:scale-95 cursor-pointer">
                   Completar Registro
                 </button>
+                
+                <button type="button" @click="quickRegister('owner')" 
+                        class="w-full py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold rounded-xl text-xs transition transform active:scale-95 cursor-pointer flex items-center justify-center space-x-1.5">
+                  <span>⚡ Crear vecino aleatorio con 1-Click</span>
+                </button>
+                
                 <button type="button" @click="toggleAuthModals" class="w-full text-center text-xs text-slate-500 hover:text-brand-600 font-medium py-1">
                   ¿Ya tienes cuenta? Inicia sesión
                 </button>
@@ -482,65 +568,299 @@
     <!-- ========================================== -->
     <!--          PRIVATE DASHBOARD VECINAL         -->
     <!-- ========================================== -->
-    <div v-else class="flex-grow flex flex-col md:flex-row h-screen overflow-hidden bg-slate-100">
+    <div v-else class="flex-grow flex flex-col h-screen overflow-hidden bg-slate-105">
       
-      <!-- Panel Sidebar (Desktop) / Header (Mobile) -->
-      <aside class="w-full md:w-64 bg-slate-900 text-white flex flex-col flex-shrink-0 border-r border-slate-800">
-        <!-- Brand / Identity -->
-        <div class="p-6 border-b border-slate-800">
-          <div class="flex items-center gap-2 text-white font-bold text-lg">
-            <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-xs">VT</div>
-            Vecindario<span class="text-brand-400">T</span>
+      <!-- CASE 1: SUPER-ADMIN COMPREHENSIVE CONTROL CENTER -->
+      <div v-if="user?.role === 'superadmin'" class="flex-grow flex flex-col md:flex-row h-full w-full overflow-hidden bg-slate-50">
+        <!-- Sidebar -->
+        <aside class="w-full md:w-64 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col flex-shrink-0 border-r border-slate-250 dark:border-slate-800">
+          <div class="p-6 border-b border-slate-150 dark:border-slate-800">
+            <div class="flex items-center gap-2 text-brand-600 dark:text-brand-400 font-bold text-lg">
+              <div class="w-7 h-7 bg-brand-500 rounded-lg flex items-center justify-center text-xs text-white shadow-md shadow-brand-500/20">SA</div>
+              <span>SuperAdmin <span class="text-slate-900 dark:text-white font-extrabold">VT</span></span>
+            </div>
           </div>
-        </div>
+          <div class="p-4 bg-slate-50/70 dark:bg-slate-950/40 border-b border-slate-150 dark:border-slate-800 flex items-center space-x-3">
+            <img :src="user?.avatarUrl" class="w-9 h-9 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-850" />
+            <div class="overflow-hidden">
+              <h4 class="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">{{ user?.name }}</h4>
+              <span class="text-[9px] text-brand-600 dark:text-brand-400 font-bold uppercase font-mono tracking-wider">Team Corporativo</span>
+            </div>
+          </div>
+          <nav class="flex-grow p-4 space-y-1.5 overflow-y-auto scrollbar-thin">
+            <button @click="setTab('fincas_global')" 
+                    class="w-full flex items-center px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer"
+                    :class="activeTab === 'fincas_global' ? 'bg-brand-600 text-white shadow-md shadow-brand-500/15' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'">
+              🏢 Edificios Registrados
+            </button>
+            <button @click="setTab('usuarios_global')" 
+                    class="w-full flex items-center px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer"
+                    :class="activeTab === 'usuarios_global' ? 'bg-brand-600 text-white shadow-md shadow-brand-500/15' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'">
+              👥 Directorio de Vecinos
+            </button>
+          </nav>
+          <div class="p-4 border-t border-slate-150 dark:border-slate-800">
+            <button @click="handleLogout" 
+                    class="w-full flex items-center justify-center py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold text-rose-650 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:text-rose-600 transition-all cursor-pointer">
+              Cerrar Sesión Base
+            </button>
+          </div>
+        </aside>
 
-        <!-- User Brief -->
-        <div class="p-4 bg-slate-950/40 border-b border-slate-800 flex items-center space-x-3">
-          <img :src="user?.avatarUrl" alt="Avatar" class="w-10 h-10 rounded-full border border-slate-700 bg-slate-800" />
-          <div class="overflow-hidden">
-            <h4 class="text-xs font-semibold text-slate-200 truncate">{{ user?.name }}</h4>
-            <div class="flex items-center space-x-1.5 mt-0.5">
-              <span class="inline-block w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
-              <span class="text-[10px] text-slate-400 capitalize font-medium">
-                {{ user?.role === 'presidente' ? '👑 Presidente' : '🧑‍💼 Vecino(a)' }}
-              </span>
+        <!-- Main Workplace -->
+        <main class="flex-grow flex flex-col overflow-hidden bg-slate-100">
+          <header class="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between flex-shrink-0">
+            <span class="text-sm font-bold text-slate-800 font-mono uppercase">Control de Infraestructura de Vecindarios</span>
+            <div class="flex items-center space-x-3">
+              <button @click="toggleLang" class="px-2.5 py-1 text-xs font-bold rounded-xl bg-slate-105 hover:bg-slate-200 border cursor-pointer text-slate-700">
+                🌐 {{ currentLang.toUpperCase() }}
+              </button>
+              <button @click="toggleDarkMode" class="p-2 rounded-xl bg-slate-105 hover:bg-slate-200 border cursor-pointer text-slate-700">
+                <span v-if="isDarkMode">☀️</span><span v-else>🌙</span>
+              </button>
+            </div>
+          </header>
+
+          <div class="flex-grow p-6 overflow-y-auto bg-slate-50 scrollbar-thin">
+            
+            <!-- tab fincas_global -->
+            <div v-slot="activeTab" v-if="activeTab === 'fincas_global'" class="space-y-6">
+              <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <div>
+                  <h3 class="text-lg font-bold text-slate-900 leading-tight">Comunidades Activas</h3>
+                  <p class="text-xs text-slate-500 mt-1">Crea nuevas fincas para generar códigos de acceso válidos para que los presidentes se registren.</p>
+                </div>
+                <button @click="showSuperCommunityModal = true" 
+                        class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl transition duration-205 cursor-pointer shadow-lg active:scale-95 flex items-center gap-2">
+                  + Registrar Urbanización
+                </button>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div v-for="com in superCommunities" :key="com._id" 
+                     class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center gap-3">
+                      <div class="bg-brand-50 text-brand-600 p-3 rounded-xl border border-brand-100 font-bold">
+                        🏢
+                      </div>
+                      <div>
+                        <h4 class="font-bold text-slate-900 text-sm leading-tight">{{ com.name }}</h4>
+                        <p class="text-[10px] text-slate-450 mt-0.5">ID: {{ com._id }}</p>
+                      </div>
+                    </div>
+                    <p class="text-xs text-slate-600 mt-4 leading-normal">
+                      📍 <strong>Dirección:</strong> {{ com.address }}
+                    </p>
+                  </div>
+                  <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between bg-slate-50 p-2.5 rounded-xl">
+                    <div>
+                      <span class="text-[9px] font-bold text-slate-400 uppercase block tracking-wider">Invitación:</span>
+                      <span class="font-mono text-xs font-black text-orange-600">
+                        {{ com.inviteCode }}
+                      </span>
+                    </div>
+                    <button @click="navigator.clipboard.writeText(com.inviteCode); showToast('📋 Código copiado.', 'success')"
+                            class="p-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-500 rounded text-[10px] font-bold cursor-pointer">
+                      Copiar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- tab usuarios_global -->
+            <div v-if="activeTab === 'usuarios_global'" class="space-y-6">
+              <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-900 font-mono">Consola General de Usuarios</h3>
+                <p class="text-xs text-slate-500 mt-1">Inspecciona y aprueba todas las deudas y permisos de usuarios en el portal.</p>
+              </div>
+
+              <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left text-xs text-slate-600 min-w-[700px]">
+                    <thead class="bg-slate-50 text-[10px] font-bold uppercase text-slate-400 tracking-wider border-b border-slate-205">
+                      <tr>
+                        <th class="px-6 py-4">Usuario</th>
+                        <th class="px-6 py-4">Contacto</th>
+                        <th class="px-6 py-4">Rol en Finca</th>
+                        <th class="px-6 py-4">Edificio Asociado</th>
+                        <th class="px-6 py-4">Vivienda</th>
+                        <th class="px-6 py-4 text-center">Validación</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 bg-white">
+                      <tr v-for="su in superUsers" :key="su._id" class="hover:bg-slate-50/50 transition-colors">
+                        <td class="px-6 py-4 font-semibold text-slate-900 flex items-center gap-2.5">
+                          <img :src="su.avatarUrl" class="w-7 h-7 rounded-full border bg-slate-100" />
+                          <div>
+                            <div class="font-bold leading-tight">{{ su.name }}</div>
+                            <div class="text-[10px] text-slate-400 font-mono font-bold">@{{ su.username }}</div>
+                          </div>
+                        </td>
+                        <td class="px-6 py-4 font-mono">{{ su.email }}</td>
+                        <td class="px-6 py-4 capitalize">
+                          <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 border text-slate-705">
+                            {{ su.role }}
+                          </span>
+                        </td>
+                        <td class="px-6 py-4 font-medium">{{ su.communityName }}</td>
+                        <td class="px-6 py-4 font-mono font-bold">{{ su.property || 'Global / SuperAdmin' }}</td>
+                        <td class="px-6 py-4 text-center">
+                          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold"
+                                :class="su.status === 'approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'">
+                            {{ su.status }}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr v-if="superUsers.length === 0">
+                        <td colspan="6" class="text-center py-12 italic text-slate-450 bg-white">Sin registros de usuarios cargados.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </main>
+
+        <!-- SuperAdmin Create Community Modal -->
+        <div v-show="showSuperCommunityModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+          <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" @click="showSuperCommunityModal = false"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-slate-200">
+              <div class="p-6">
+                <div class="flex justify-between items-center mb-5">
+                  <h3 class="text-lg font-bold text-slate-900">Registrar Nueva Comunidad</h3>
+                  <button @click="showSuperCommunityModal = false" class="text-slate-400 hover:text-slate-600">
+                    ✕
+                  </button>
+                </div>
+
+                <form @submit.prevent="submitSuperCommunity" class="space-y-4">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Nombre del Complejo / Edificio</label>
+                    <input type="text" v-model="superCommunityForm.name" required placeholder="p.ej. Residencial Las Acacias d'Elíte"
+                           class="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white outline-none text-slate-800 text-sm focus:border-brand-500" />
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Dirección Exacta</label>
+                    <input type="text" v-model="superCommunityForm.address" required placeholder="p.ej. Av. del Mediterráneo Nº 23, Madrid"
+                           class="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white outline-none text-slate-800 text-sm focus:border-brand-500" />
+                  </div>
+
+                  <div class="pt-4 flex justify-end space-x-3">
+                    <button type="button" @click="showSuperCommunityModal = false"
+                            class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-xs transition">Cancelar</button>
+                    <button type="submit"
+                            class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-md transition">Dar de Alta Finca</button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- CASE 2: VECINO ACCOUNT PENDING APPROVAL -->
+      <div v-else-if="user?.status === 'pending'" class="flex-grow flex items-center justify-center p-6 bg-slate-50 dark:bg-slate-950 h-screen w-full">
+        <div class="max-w-md w-full bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-200 dark:border-slate-800 shadow-2xl text-center space-y-6">
+          <div class="mx-auto w-16 h-16 bg-amber-50 dark:bg-amber-950/40 text-amber-500 rounded-2xl flex items-center justify-center border border-amber-200 dark:border-amber-900 animate-pulse">
+            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Solicitud Pendiente de Aprobación</h3>
+            <p class="text-xs text-slate-500 mt-2">Hola, <span class="font-semibold text-slate-700 dark:text-slate-300">{{ user?.name || 'Vecino/a' }}</span>.</p>
+          </div>
+
+          <div class="p-5 bg-indigo-50/50 dark:bg-indigo-950/20 rounded-2xl border border-indigo-100 dark:border-indigo-900 text-xs text-slate-650 dark:text-slate-350 leading-relaxed text-left space-y-2">
+            <p>📍 Tu registro en la comunidad de <strong>{{ community?.name || 'la urbanización' }}</strong> se ha realizado correctamente.</p>
+            <p>🏠 Tu cuenta está unida correspondientemente a la vivienda: <span class="font-bold underline text-indigo-600 dark:text-indigo-400">Planta {{ myProperty?.floor || '—' }}, Puerta {{ myProperty?.door || '—' }} (Bloque {{ myProperty?.block || '—' }})</span>.</p>
+            <p class="text-amber-600 dark:text-amber-400 font-bold mt-2">⚙️ Por favor, espera a que el Administrador / Presidente de tu comunidad apruebe tu acceso para ver el portal completo.</p>
+          </div>
+
+          <!-- DEMO PASS AND ACTIONS -->
+          <div class="pt-5 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2.5">
+            <button @click="handleSelfApprove" class="w-full py-3 bg-gradient-to-r from-violet-650 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-bold rounded-xl text-xs shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition transform active:scale-95 cursor-pointer">
+              ⚡ Omitir Espera: Aprobar Cuenta al Instante (Modo Demo)
+            </button>
+            
+            <button @click="loadDashboardData" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs transition cursor-pointer">
+              🔄 Volver a comprobar estado
+            </button>
+            <button @click="handleLogout" class="w-full py-2.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-bold rounded-xl text-xs transition cursor-pointer">
+              🚪 Cerrar Sesión
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CASE 3: APPROVED NEIGHBORS / ADMIN DASHBOARD -->
+      <div v-else class="flex-grow flex flex-col md:flex-row h-full w-full overflow-hidden bg-slate-100">
+        
+        <!-- Panel Sidebar (Desktop) / Header (Mobile) -->
+        <aside class="w-full md:w-64 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col flex-shrink-0 border-r border-slate-250 dark:border-slate-800">
+          <!-- Brand / Identity -->
+          <div class="p-6 border-b border-slate-150 dark:border-slate-800">
+            <div class="flex items-center gap-2 text-brand-600 dark:text-brand-400 font-bold text-lg animate-fade-in">
+              <div class="w-7 h-7 bg-brand-500 rounded-lg flex items-center justify-center text-xs text-white shadow-md shadow-brand-500/20">VT</div>
+              <span>Vecindario<span class="text-slate-900 dark:text-white font-extrabold">T</span></span>
+            </div>
+          </div>
+
+          <!-- User Brief -->
+          <div class="p-4 bg-slate-50/70 dark:bg-slate-950/40 border-b border-slate-150 dark:border-slate-800 flex items-center space-x-3">
+            <img :src="user?.avatarUrl" alt="Avatar" class="w-9 h-9 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-850" />
+            <div class="overflow-hidden">
+              <h4 class="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">{{ user?.name }}</h4>
+              <div class="flex items-center space-x-1.5 mt-0.5">
+                <span class="inline-block w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 capitalize font-medium">
+                  {{ user?.role === 'admin' ? '👑 Admin Bloque' : user?.role === 'owner' ? '🏡 Propietario' : '🔑 Inquilino' }}
+                </span>
+              </div>
+            </div>
+          </div>
 
         <!-- System Navigation Tabs -->
         <nav class="flex-grow p-4 space-y-1.5 overflow-y-auto scrollbar-thin">
           <button @click="setTab('recibos')" 
-                  class="w-full flex items-center px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer"
-                  :class="activeTab === 'recibos' ? 'bg-brand-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'">
-            <svg class="w-4.5 h-4.5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  class="w-full flex items-center px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer"
+                  :class="activeTab === 'recibos' ? 'bg-brand-600 text-white shadow-md shadow-brand-500/15' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'">
+            <svg class="w-4 h-4 mr-2.5 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             {{ t('nav.receipts') }}
           </button>
 
           <button @click="setTab('finanzas')" 
-                  class="w-full flex items-center px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer"
-                  :class="activeTab === 'finanzas' ? 'bg-brand-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'">
-            <svg class="w-4.5 h-4.5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  class="w-full flex items-center px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer"
+                  :class="activeTab === 'finanzas' ? 'bg-brand-600 text-white shadow-md shadow-brand-500/15' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'">
+            <svg class="w-4 h-4 mr-2.5 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
             </svg>
             {{ t('nav.finances') }}
           </button>
 
           <button @click="setTab('votaciones')" 
-                  class="w-full flex items-center px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer"
-                  :class="activeTab === 'votaciones' ? 'bg-brand-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'">
-            <svg class="w-4.5 h-4.5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  class="w-full flex items-center px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer"
+                  :class="activeTab === 'votaciones' ? 'bg-brand-600 text-white shadow-md shadow-brand-500/15' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'">
+            <svg class="w-4 h-4 mr-2.5 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
             </svg>
             {{ t('nav.votes') }}
           </button>
 
           <button @click="setTab('reservas')" 
-                  class="w-full flex items-center px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer"
-                  :class="activeTab === 'reservas' ? 'bg-brand-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'">
-            <svg class="w-4.5 h-4.5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  class="w-full flex items-center px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer"
+                  :class="activeTab === 'reservas' ? 'bg-brand-600 text-white shadow-md shadow-brand-500/15' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'">
+            <svg class="w-4 h-4 mr-2.5 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
             {{ t('nav.bookings') }}
@@ -548,21 +868,21 @@
 
           <!-- NUEVA TAB: Incidencias Vecinales con Fotos -->
           <button @click="setTab('incidencias')" 
-                  class="w-full flex items-center px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer"
-                  :class="activeTab === 'incidencias' ? 'bg-brand-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'">
-            <svg class="w-4.5 h-4.5 mr-3 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  class="w-full flex items-center px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer"
+                  :class="activeTab === 'incidencias' ? 'bg-brand-600 text-white shadow-md shadow-brand-500/15' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'">
+            <svg class="w-4 h-4 mr-2.5 text-rose-500 dark:text-rose-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             {{ t('nav.issues') }}
           </button>
 
           <!-- PRESIDENT EXCLUSIVE AREA -->
-          <div v-if="user?.role === 'presidente'" class="pt-5 border-t border-slate-800 mt-5">
-            <span class="block px-3.5 text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-2">Panel Presidencial</span>
+          <div v-if="user?.role === 'presidente' || user?.role === 'admin'" class="pt-5 border-t border-slate-200 dark:border-slate-800 mt-5 animate-fade-in">
+            <span class="block px-3.5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 font-mono">Panel Presidencial</span>
             <button @click="setTab('administrar')" 
-                    class="w-full flex items-center px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer text-amber-550"
-                    :class="activeTab === 'administrar' ? 'bg-amber-600 text-white' : 'text-amber-400/90 hover:bg-yellow-950/20 hover:text-amber-400'">
-              <svg class="w-4.5 h-4.5 mr-3 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    class="w-full flex items-center px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 cursor-pointer text-amber-650"
+                    :class="activeTab === 'administrar' ? 'bg-amber-500 text-white shadow-md shadow-amber-500/15' : 'text-amber-600 dark:text-amber-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'">
+              <svg class="w-4 h-4 mr-2.5 text-amber-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
@@ -572,9 +892,9 @@
         </nav>
 
         <!-- Log out button -->
-        <div class="p-4 border-t border-slate-800">
+        <div class="p-4 border-t border-slate-150 dark:border-slate-800">
           <button @click="handleLogout" 
-                  class="w-full flex items-center justify-center py-2.5 border border-slate-800 rounded-xl text-xs font-semibold text-rose-450 hover:bg-rose-950/20 hover:text-rose-400 transition-all cursor-pointer">
+                  class="w-full flex items-center justify-center py-2.5 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold text-rose-650 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:text-rose-600 transition-all cursor-pointer">
             <svg class="w-4 h-4 mr-2 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
@@ -1042,7 +1362,7 @@
               </div>
 
               <!-- Quick create vote for President in current tab for better UX -->
-              <button v-if="user?.role === 'presidente'" 
+              <button v-if="user?.role === 'presidente' || user?.role === 'admin'" 
                       @click="showCreateVoteForm = !showCreateVoteForm"
                       class="inline-flex items-center space-x-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl transition-all shadow-md active:scale-95 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -1175,7 +1495,7 @@
                 </div>
 
                 <!-- Admin close button inside card -->
-                <div v-if="user?.role === 'presidente' && vote.status === 'active'" class="mt-4 flex justify-end">
+                <div v-if="(user?.role === 'presidente' || user?.role === 'admin') && vote.status === 'active'" class="mt-4 flex justify-end">
                   <button @click="closeCommunityVote(vote._id)" class="text-[10px] font-bold text-slate-400 hover:text-rose-600 flex items-center bg-transparent border-0 cursor-pointer">
                     Cerrar con llave
                   </button>
@@ -1478,7 +1798,7 @@
                       </div>
 
                       <!-- Admin Controls right inline (President Only) -->
-                      <div v-if="user?.role === 'presidente'" 
+                      <div v-if="user?.role === 'presidente' || user?.role === 'admin'" 
                            class="flex flex-col max-sm:w-full space-y-1.5 bg-white p-3 rounded-xl border border-slate-200 flex-shrink-0">
                         <span class="text-[9px] font-black uppercase text-slate-400 block tracking-wider mb-1">Acción Admin</span>
                         
@@ -1516,7 +1836,7 @@
           <!-- ========================================== -->
           <!--       TAB 5: ADMINISTRAR (PRESIDENTE ONLY)  -->
           <!-- ========================================== -->
-          <div v-if="activeTab === 'administrar' && user?.role === 'presidente'" class="space-y-6">
+          <div v-if="activeTab === 'administrar' && (user?.role === 'presidente' || user?.role === 'admin')" class="space-y-6">
             <div class="flex justify-between items-center bg-transparent border-b pb-2">
               <div>
                 <h3 class="text-xl font-bold text-slate-900 leading-none flex items-center gap-2">
@@ -1784,7 +2104,8 @@
         </div>
       </main>
 
-    </div>
+      </div> <!-- /CASE 3 APPROVED VECINOS -->
+    </div> <!-- /PRIVATE VECINAL WRAPPER -->
 
     <!-- ========================================== -->
     <!--      FACTURA INVOICE MODAL DE AUDITORÍA     -->
@@ -1850,6 +2171,113 @@
       </div>
     </div>
 
+    <!-- ========================================== -->
+    <!--     FLOATING GEMINI BOT VOICE & CHATBURBUJA -->
+    <!-- ========================================== -->
+    <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+      <!-- Chat Bubble Container -->
+      <transition name="fade">
+        <div v-show="showFloatingChat" 
+             class="mb-4 w-80 md:w-96 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-250 dark:border-slate-800 overflow-hidden flex flex-col"
+             style="height: 480px;">
+          
+          <!-- Header -->
+          <div class="px-5 py-4 bg-slate-900 border-b border-slate-805 flex items-center justify-between text-white flex-shrink-0">
+            <div class="flex items-center space-x-2.5">
+              <div class="relative flex h-3 w-3">
+                <span v-if="isListening" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3" :class="isListening ? 'bg-emerald-500' : 'bg-indigo-500'"></span>
+              </div>
+              <div>
+                <h4 class="text-xs font-bold font-mono tracking-tight uppercase">Vecindario Inteligente IA</h4>
+                <p class="text-[9px] text-slate-300">Asistente Gemini Live en línea</p>
+              </div>
+            </div>
+            <button @click="showFloatingChat = false" class="text-slate-400 hover:text-white transition bg-transparent border-0 cursor-pointer">
+              ✕
+            </button>
+          </div>
+
+          <!-- Message History -->
+          <div class="flex-grow p-4 overflow-y-auto bg-slate-50 dark:bg-slate-950/60 text-xs space-y-3.5 scrollbar-thin flex flex-col" id="chat-messages-container">
+            <!-- System Welcome -->
+            <div class="flex flex-col space-y-1 items-start max-w-[85%] self-start">
+              <span class="text-[9px] text-slate-400 font-bold ml-1 font-mono">IA VECINDARIO</span>
+              <div class="bg-indigo-50 text-indigo-950 dark:bg-indigo-950/40 dark:text-indigo-200 px-3.5 py-2.5 rounded-2xl rounded-tl-none border border-indigo-100/40 dark:border-indigo-900/40 shadow-sm leading-relaxed">
+                ¡Hola! Soy tu asistente de VecindarioTransparente. Puedes consultarme sobre presupuestos, actas, deudas, estatutos o reportar una incidencia. Pulsa el botón del micrófono para activar la voz interactiva en vivo, o escríbeme aquí abajo.
+              </div>
+            </div>
+
+            <!-- Custom text chats logged during current talk -->
+            <div v-for="msg in floatingChatMessages" :key="msg.id" 
+                 class="flex flex-col space-y-1 max-w-[85%]"
+                 :class="msg.sender === 'user' ? 'self-end items-end' : 'self-start items-start'">
+              <span class="text-[9px] text-slate-400 font-bold px-1 font-mono uppercase">
+                {{ msg.sender === 'user' ? 'Tú' : 'IA' }}
+              </span>
+              <div class="px-3.5 py-2.5 rounded-2xl shadow-sm leading-relaxed font-sans"
+                   :class="msg.sender === 'user' 
+                     ? 'bg-indigo-600 text-white rounded-tr-none text-xs' 
+                     : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-800 rounded-tl-none text-xs'">
+                {{ msg.text }}
+              </div>
+            </div>
+
+            <!-- Real-time Status banner if listening -->
+            <div v-if="isListening" class="self-center bg-red-50 text-red-700 dark:bg-red-950/20 dark:text-red-400 py-1.5 px-3 rounded-full border border-red-200 text-[10px] font-bold animate-pulse">
+              🎙️ Grabando audio en vivo... Habla directamente
+            </div>
+
+            <!-- Assistant currently thinking status -->
+            <div v-if="floatingBotThinking" class="self-start text-[10px] text-slate-400 italic animate-pulse">
+              Gemini está procesando tu respuesta...
+            </div>
+          </div>
+
+          <!-- Input Block -->
+          <div class="p-3 bg-white dark:bg-slate-900 border-t border-slate-150 dark:border-slate-850 flex items-center gap-2 flex-shrink-0">
+            <!-- Micro activator badge -->
+            <button @click="toggleVoiceAssistant" 
+                    title="Alternar comunicación por Voz Gemini Live"
+                    class="w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer border-0 outline-none"
+                    :class="isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-850 dark:text-slate-300 dark:hover:bg-slate-800'">
+              <svg class="w-4.5 h-4.5 text-current" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+              </svg>
+            </button>
+
+            <!-- Text Prompt -->
+            <input type="text"
+                   v-model="floatingChatPrompt"
+                   @keyup.enter="submitFloatingChatText"
+                   placeholder="Escribe un mensaje..."
+                   class="flex-grow h-10 px-3 py-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-800 dark:text-white outline-none focus:border-indigo-500 transition-all focus:bg-white" />
+            
+            <!-- Send Button -->
+            <button @click="submitFloatingChatText"
+                    class="w-10 h-10 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center transition cursor-pointer active:scale-95 border-0 font-bold outline-none">
+              Enviar
+            </button>
+          </div>
+        </div>
+      </transition>
+
+      <!-- Main Floating Launch Circular Button -->
+      <button @click="toggleFloatingChat" 
+              class="w-14 h-14 bg-indigo-605 hover:bg-indigo-600 text-white rounded-full flex items-center justify-center shadow-2xl hover:shadow-indigo-500/20 transition-all hover:scale-110 active:scale-95 duration-200 border border-white/10 relative cursor-pointer outline-none">
+        
+        <!-- Live ripple effect if recording -->
+        <span v-if="isListening" class="absolute -inset-1 rounded-full bg-red-400/25 animate-ping"></span>
+        
+        <svg v-if="!showFloatingChat" class="w-6.5 h-6.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+        <svg v-else class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
   </div>
 
   <!-- Vue 3 SPA Application logic -->
@@ -1866,6 +2294,18 @@
         const showRegisterModal = ref(false);
         const activeInvoiceAudit = ref(null);
         const showCreateVoteForm = ref(false);
+
+        // SuperAdmin Control States
+        const superCommunities = ref([]);
+        const superUsers = ref([]);
+        const showSuperCommunityModal = ref(false);
+        const superCommunityForm = reactive({ name: '', address: '' });
+
+        // Floating Chat States
+        const showFloatingChat = ref(false);
+        const floatingChatPrompt = ref('');
+        const floatingChatMessages = ref([]);
+        const floatingBotThinking = ref(false);
 
         // Extra 2.0 premium states
         const isDarkMode = ref(false);
@@ -1928,10 +2368,12 @@
           name: '',
           email: '',
           password: '',
+          role: 'owner',
           inviteCode: 'ALAMEDA2026',
           block: '',
           floor: '',
-          door: ''
+          door: '',
+          autoApproved: true
         });
 
         const bookingForm = reactive({
@@ -2024,10 +2466,11 @@
 
           try {
             const response = await fetch(endpoint, config);
-            const data = await response.json();
             if (!response.ok) {
-              throw new Error(data.error || 'Algo salió mal en el servidor.');
+              const errorText = await response.text();
+              throw new Error(`Error en el servidor (${response.status}): ${errorText}`);
             }
+            const data = await response.json();
             return data;
           } catch (error) {
             console.error("API Fetch Error on:", endpoint, error);
@@ -2095,6 +2538,39 @@
           }
         };
 
+        const handleSelfApprove = async () => {
+          try {
+            const data = await apiFetch('/api/auth/self-approve', {
+              method: 'POST'
+            });
+            showToast(data.message, 'success');
+            await loadDashboardData();
+          } catch (e) {
+            showToast(e.message, 'error');
+          }
+        };
+
+        const quickLogin = async (username, password) => {
+          loginForm.usernameOrEmail = username;
+          loginForm.password = password;
+          await handleLogin();
+        };
+
+        const quickRegister = async (role) => {
+          const suffix = Math.random().toString(36).substring(2, 5);
+          registerForm.username = `test_${role}_${suffix}`;
+          registerForm.name = `Vecino Demo ${suffix.toUpperCase()}`;
+          registerForm.email = `test_${suffix}@alameda.es`;
+          registerForm.password = "vecino123";
+          registerForm.role = role;
+          registerForm.inviteCode = "ALAMEDA2026";
+          registerForm.block = "A";
+          registerForm.floor = "3º";
+          registerForm.door = "D";
+          registerForm.autoApproved = true;
+          await handleRegister();
+        };
+
         const handleLogout = () => {
           token.value = null;
           user.value = null;
@@ -2105,6 +2581,85 @@
           showToast("Sesión cerrada correctamente. ¡Hasta pronto!", 'info');
         };
 
+        const submitSuperCommunity = async () => {
+          try {
+            if (!superCommunityForm.name.trim() || !superCommunityForm.address.trim()) {
+              throw new Error("Agregue el nombre y la dirección del complejo.");
+            }
+
+            const data = await apiFetch('/api/superadmin/communities', {
+              method: 'POST',
+              body: JSON.stringify({
+                name: superCommunityForm.name,
+                address: superCommunityForm.address
+              })
+            });
+
+            showToast(data.message, 'success');
+            superCommunityForm.name = '';
+            superCommunityForm.address = '';
+            showSuperCommunityModal.value = false;
+
+            // re-fetch communities
+            await fetchTabContent();
+          } catch (e) {
+            showToast(e.message, 'error');
+          }
+        };
+
+        const toggleFloatingChat = () => {
+          showFloatingChat.value = !showFloatingChat.value;
+        };
+
+        const submitFloatingChatText = async () => {
+          const text = floatingChatPrompt.value.trim();
+          if (!text) return;
+
+          floatingChatMessages.value.push({
+            id: Date.now() + "-user",
+            sender: "user",
+            text
+          });
+          floatingChatPrompt.value = '';
+          floatingBotThinking.value = true;
+
+          // Scroll messages
+          setTimeout(() => {
+            const container = document.getElementById('chat-messages-container');
+            if (container) container.scrollTop = container.scrollHeight;
+          }, 100);
+
+          try {
+            const res = await apiFetch('/api/assistant', {
+              method: 'POST',
+              body: JSON.stringify({ prompt: text })
+            });
+
+            const replyText = res.reply || res.error || "Disculpa, ha ocurrido un error al procesar tu consulta.";
+            floatingChatMessages.value.push({
+              id: Date.now() + "-bot",
+              sender: "bot",
+              text: replyText
+            });
+
+            // Speak out reply if speech synthesis active
+            assistantResponse.value = replyText;
+            speakAssistantResponse();
+          } catch (e) {
+            floatingChatMessages.value.push({
+              id: Date.now() + "-bot",
+              sender: "bot",
+              text: "No se pudo conectar con el servidor para procesar tu consulta o falta tu API Key."
+            });
+          } finally {
+            floatingBotThinking.value = false;
+            setTimeout(() => {
+              const container = document.getElementById('chat-messages-container');
+              if (container) container.scrollTop = container.scrollHeight;
+            }, 100);
+          }
+        };
+
         // Dashboard Data Extractors
         const loadDashboardData = async () => {
           try {
@@ -2113,6 +2668,16 @@
             user.value = session.user;
             community.value = session.community;
             myProperty.value = session.property;
+
+            // Auto-switch default tab depending on role
+            if (session.user.role === 'superadmin') {
+              activeTab.value = 'fincas_global';
+            } else if (session.user.status === 'pending') {
+              // Pending neighbor doesn't require loaded tabs
+              return;
+            } else {
+              activeTab.value = 'recibos';
+            }
 
             // Initialize default scheduling inputs
             bookingForm.date = getTodayString();
@@ -2129,6 +2694,19 @@
           if (!token.value) return;
 
           try {
+            // SuperAdmin Core fetching
+            if (user.value?.role === 'superadmin') {
+              if (activeTab.value === 'fincas_global') {
+                const coms = await apiFetch('/api/superadmin/communities');
+                superCommunities.value = coms;
+              } else if (activeTab.value === 'usuarios_global') {
+                const ulist = await apiFetch('/api/superadmin/users');
+                superUsers.value = ulist;
+              }
+              return;
+            }
+
+            // Regular tabs fetching
             if (activeTab.value === 'recibos') {
               const prop = await apiFetch('/api/properties/my');
               myProperty.value = prop;
@@ -2145,7 +2723,7 @@
             } else if (activeTab.value === 'incidencias') {
               const list = await apiFetch('/api/issues');
               issuesList.value = list;
-            } else if (activeTab.value === 'administrar' && user.value.role === 'presidente') {
+            } else if (activeTab.value === 'administrar' && (user.value?.role === 'presidente' || user.value?.role === 'admin')) {
               const props = await apiFetch('/api/properties');
               propertiesList.value = props;
               const users = await apiFetch('/api/users');
@@ -2247,7 +2825,7 @@
         };
 
         const bookingCanBeDeleted = (bookingObj) => {
-          if (user.value?.role === 'presidente') return true;
+          if (user.value?.role === 'presidente' || user.value?.role === 'admin') return true;
           return bookingIsMine(bookingObj);
         };
 
@@ -2522,6 +3100,9 @@
 
             const res = await apiFetch('/api/issues', {
               method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
               body: JSON.stringify({
                 title: issueForm.title,
                 description: issueForm.description,
@@ -2969,6 +3550,21 @@
           receiptEmiter,
           commFinanceForm,
 
+          // SuperAdmin properties
+          superCommunities,
+          superUsers,
+          showSuperCommunityModal,
+          superCommunityForm,
+          submitSuperCommunity,
+
+          // Floating Chat properties
+          showFloatingChat,
+          floatingChatPrompt,
+          floatingChatMessages,
+          floatingBotThinking,
+          toggleFloatingChat,
+          submitFloatingChatText,
+
           // Helper behaviors
           showToast,
           formatDate,
@@ -3026,6 +3622,9 @@
           handleLogin,
           handleRegister,
           handleLogout,
+          handleSelfApprove,
+          quickLogin,
+          quickRegister,
           calculatePercentage,
           getVoteCount,
           hasCastedVote,

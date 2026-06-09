@@ -10,9 +10,9 @@ export interface User {
   email: string;
   passwordHash: string;
   avatarUrl: string;
-  role: "admin" | "vecino" | "presidente";
-  status: "active" | "pending";
-  communityId: string;
+  role: "superadmin" | "admin" | "owner" | "tenant";
+  status: "approved" | "pending";
+  communityId?: string; // Optional for superadmin
 }
 
 export interface Community {
@@ -173,11 +173,21 @@ class LocalDB {
       name: "Residencial Alameda",
       address: "Calle de la Transparencia 42, Madrid",
       inviteCode: "ALAMEDA2026"
-    };
-
-    // Users (Default Admin and Default Vecino)
+    };    // Users (Default Admin, SuperAdmin and Default Vecinos)
+    const superPassHash = bcrypt.hashSync("superadmin123", 10);
     const adminPassHash = bcrypt.hashSync("admin123", 10);
     const vecinoPassHash = bcrypt.hashSync("vecino123", 10);
+
+    const userSuperAdmin: User = {
+      _id: "user_superadmin",
+      username: "superadmin",
+      name: "Soporte Global Vecindario",
+      email: "soporte@vecindariotransparente.es",
+      passwordHash: superPassHash,
+      avatarUrl: "https://api.dicebear.com/7.x/bottts/svg?seed=superglobal",
+      role: "superadmin",
+      status: "approved"
+    };
 
     const userAdmin: User = {
       _id: "user_presidente",
@@ -186,8 +196,8 @@ class LocalDB {
       email: "presidente@alameda.es",
       passwordHash: adminPassHash,
       avatarUrl: "https://api.dicebear.com/7.x/bottts/svg?seed=carlos",
-      role: "presidente",
-      status: "active",
+      role: "admin",
+      status: "approved",
       communityId
     };
 
@@ -198,8 +208,8 @@ class LocalDB {
       email: "juan@alameda.es",
       passwordHash: vecinoPassHash,
       avatarUrl: "https://api.dicebear.com/7.x/bottts/svg?seed=juan",
-      role: "vecino",
-      status: "active",
+      role: "owner",
+      status: "approved",
       communityId
     };
 
@@ -210,8 +220,8 @@ class LocalDB {
       email: "maria@alameda.es",
       passwordHash: vecinoPassHash,
       avatarUrl: "https://api.dicebear.com/7.x/bottts/svg?seed=maria",
-      role: "vecino",
-      status: "active",
+      role: "tenant",
+      status: "approved",
       communityId
     };
 
