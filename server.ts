@@ -97,6 +97,8 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   avatarUrl: String,
+  bio: String,
+  phone: String,
   role: { type: String, enum: ["admin", "vecino", "presidente"], default: "vecino" },
   status: { type: String, enum: ["active", "pending"], default: "active" },
   communityId: String
@@ -395,6 +397,8 @@ app.post("/api/auth/register", async (req, res) => {
         name: newUser.name,
         email: newUser.email,
         avatarUrl: newUser.avatarUrl,
+        bio: newUser.bio,
+        phone: newUser.phone,
         role: newUser.role,
         status: newUser.status,
         communityId: newUser.communityId
@@ -463,6 +467,8 @@ app.post("/api/auth/login", async (req, res) => {
         name: user.name,
         email: user.email,
         avatarUrl: user.avatarUrl,
+        bio: user.bio,
+        phone: user.phone,
         role: user.role,
         status: user.status,
         communityId: user.communityId || ""
@@ -500,12 +506,91 @@ app.get("/api/auth/me", authenticateToken, (req: AuthRequest, res) => {
       name: userObj.name,
       email: userObj.email,
       avatarUrl: userObj.avatarUrl,
+      bio: userObj.bio,
+      phone: userObj.phone,
       role: userObj.role,
       status: userObj.status,
       communityId: userObj.communityId || ""
     },
     community: communityObj || null,
     property: propertyObj || null
+  });
+});
+
+app.put("/api/auth/profile", authenticateToken, async (req: AuthRequest, res) => {
+  if (!req.user) {
+    res.status(401).json({ error: "No autorizado." });
+    return;
+  }
+
+  const { name, email, avatarUrl, bio, phone, currentPassword, newPassword } = req.body;
+  const users = dbSource.getUsers();
+  const userObj = users.find(u => u._id === req.user?.userId);
+
+  if (!userObj) {
+    res.status(404).json({ error: "Usuario no encontrado." });
+    return;
+  }
+
+  if (email && email !== userObj.email) {
+    const emailTaken = users.some(u => u.email.toLowerCase() === email.toLowerCase() && u._id !== userObj._id);
+    if (emailTaken) {
+      res.status(400).json({ error: "El correo electrónico ya está en uso por otro usuario." });
+      return;
+    }
+  }
+
+  if ((currentPassword && !newPassword) || (!currentPassword && newPassword)) {
+    res.status(400).json({ error: "Para cambiar contraseña debe indicar la contraseña actual y la nueva." });
+    return;
+  }
+
+  if (currentPassword && newPassword) {
+    const isValid = await bcrypt.compare(currentPassword, userObj.passwordHash);
+    if (!isValid) {
+      res.status(400).json({ error: "La contraseña actual no es correcta." });
+      return;
+    }
+    userObj.passwordHash = await bcrypt.hash(newPassword, 10);
+  }
+
+  if (name) userObj.name = name;
+  if (email) userObj.email = email;
+  if (avatarUrl !== undefined) userObj.avatarUrl = avatarUrl;
+  if (bio !== undefined) userObj.bio = bio;
+  if (phone !== undefined) userObj.phone = phone;
+
+  dbSource.save();
+
+  if (isUsingMongoDB) {
+    try {
+      await MongooseUserObj.findOneAndUpdate({ _id: userObj._id } as any, {
+        name: userObj.name,
+        email: userObj.email,
+        avatarUrl: userObj.avatarUrl,
+        bio: userObj.bio,
+        phone: userObj.phone,
+        password: userObj.passwordHash
+      } as any, { new: true } as any);
+    } catch (updateErr: any) {
+      console.warn("No se pudo actualizar el perfil en MongoDB:", updateErr.message);
+    }
+  }
+
+  res.json({
+    message: "Perfil actualizado correctamente.",
+    user: {
+      userId: userObj._id,
+      username: userObj.username,
+      name: userObj.name,
+      email: userObj.email,
+      avatarUrl: userObj.avatarUrl,
+      bio: userObj.bio,
+      phone: userObj.phone,
+      role: userObj.role,
+      status: userObj.status,
+      communityId: userObj.communityId || ""
+    }
   });
 });
 
@@ -1374,127 +1459,97 @@ Petición del vecino: "${prompt}"`;
 // ---------------- WebSocket Server for Gemini Live Relay ----------------
 const wss = new WebSocketServer({ noServer: true });
 
-wss.on("connection", (ws, request) => {
+wss.on("connection", async (ws, request) => {
   console.log("[WS] Nueva conexión entrante para Gemini Live.");
-  
   const apiKey = process.env.GEMINI_API_KEY;
+
   if (!apiKey) {
     ws.send(JSON.stringify({ type: "error", error: "Falta la API Key de Gemini en el servidor." }));
     ws.close();
     return;
   }
 
-  // Connect to Gemini Live bidirectional WebSocket
-  const geminiUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1.GenerativeService.BidiGenerateContent?key=${apiKey}`;
-  const geminiWs = new WS(geminiUrl);
+  let session: any = null;
+  let isGeminiConnected = false;
 
-  geminiWs.on("open", () => {
-    console.log("[WS] Conectado exitosamente con Gemini Live API.");
-    // Send initial configuration message
-    const setupMsg = {
-      setup: {
-        model: "gemini-live-2.5-flash-preview",
-        generationConfig: {
-          responseModalities: ["AUDIO"],
-          speechConfig: {
-            voiceConfig: {
-              prebuiltVoiceConfig: {
-                voiceName: "Aoede" // friendly voice
+  try {
+    const ai = getGeminiClient();
+    session = await ai.live.connect({
+      model: "gemini-live-2.5-flash-preview",
+      config: {
+        responseModalities: ["AUDIO"]
+      },
+      callbacks: {
+        onopen: () => {
+          isGeminiConnected = true;
+          console.log("[WS] Conectado exitosamente con Gemini Live API.");
+          ws.send(JSON.stringify({ type: "status", status: "connected", message: "Conectado al asistente de voz Gemini Live." }));
+        },
+        onmessage: (event) => {
+          try {
+            const resp = event;
+            const parts = resp.serverContent?.modelTurn?.parts;
+            if (parts) {
+              for (const part of parts) {
+                if (part.inlineData?.data) {
+                  ws.send(JSON.stringify({ type: "audio", data: part.inlineData.data }));
+                }
+                if (part.text && part.text.trim()) {
+                  ws.send(JSON.stringify({ type: "text", data: part.text }));
+                }
               }
             }
+            if (resp.serverContent?.turnComplete) {
+              ws.send(JSON.stringify({ type: "turnComplete" }));
+            }
+          } catch (e: any) {
+            console.warn("[WS] Error parseando mensaje de Gemini Live:", e.message);
           }
         },
-        systemInstruction: {
-          parts: [{
-            text: `Actúas como el Asistente de Voz de la comunidad Residencial Alameda.
-            Tu objetivo es asistir de manera asombrosamente concisa, breve y óptima para la lectura de voz (máximo 2 a 3 frases por respuesta).
-            El vecino te hablará por voz (PCM @ 16kHz). Respóndele a sus dudas comunitarias con el tono de un conserje o presidente amable. No inventes balanzas ni datos ficticios, y sé siempre cordial.`
-          }]
+        onerror: (err) => {
+          console.error("[WS] Error de Gemini Live:", err.message);
+          try {
+            ws.send(JSON.stringify({ type: "error", error: `Error de red directo con la API de Gemini: ${err.message}` }));
+          } catch (_) {}
+        },
+        onclose: () => {
+          console.log("[WS] Conexión de Gemini Live cerrada.");
+          try {
+            ws.close();
+          } catch (_) {}
         }
       }
-    };
-    geminiWs.send(JSON.stringify(setupMsg));
-    ws.send(JSON.stringify({ type: "status", status: "connected", message: "Conectado al asistente de voz Gemini Live." }));
-  });
-
-  geminiWs.on("message", (data) => {
-    try {
-      const dataStr = data.toString().trim();
-      if (!dataStr) return; // Prevent parsing empty messages
-
-      const resp = JSON.parse(dataStr);
-      const parts = resp.serverContent?.modelTurn?.parts;
-      if (parts) {
-        for (const part of parts) {
-          if (part.inlineData?.data) {
-            ws.send(JSON.stringify({
-              type: "audio",
-              data: part.inlineData.data
-            }));
-          }
-          if (part.text && part.text.trim()) {
-            ws.send(JSON.stringify({
-              type: "text",
-              data: part.text
-            }));
-          }
-        }
-      }
-      if (resp.serverContent?.turnComplete) {
-        ws.send(JSON.stringify({ type: "turnComplete" }));
-      }
-    } catch (e: any) {
-      console.warn("[WS] Error parseando respuesta del socket de Gemini:", e.message);
-      // Fallback: send clean status structure or log safely without crashing
-    }
-  });
-
-  geminiWs.on("error", (err) => {
-    console.error("[WS] Error de Gemini WS: ", err.message);
+    });
+  } catch (err: any) {
+    console.error("[WS] No se pudo conectar a Gemini Live:", err.message);
     try {
       ws.send(JSON.stringify({ type: "error", error: `Error de red directo con la API de Gemini: ${err.message}` }));
     } catch (_) {}
-  });
+    ws.close();
+    return;
+  }
 
-  geminiWs.on("close", (code, reason) => {
-    console.log("[WS] Conexión de Gemini WS cerrada.", code, reason.toString());
-    try {
-      ws.close();
-    } catch (_) {}
-  });
-
-  ws.on("message", (message) => {
+  ws.on("message", async (message) => {
     try {
       const msgStr = message.toString().trim();
-      if (!msgStr) return; // ignore completely empty frames or pings
+      if (!msgStr) return;
 
       const reqMsg = JSON.parse(msgStr);
+
+      if (!session) {
+        throw new Error("Sesión Gemini Live no inicializada aún.");
+      }
+
       if (reqMsg.type === "audio" && reqMsg.data && reqMsg.data.trim()) {
-        const normalizedData = reqMsg.data.trim();
-        const realTimeInput = {
-          realtimeInput: {
-            audio: {
-              mimeType: "audio/pcm;rate=16000",
-              data: normalizedData
-            }
+        const audioData = reqMsg.data.trim();
+        session.sendRealtimeInput({
+          audio: {
+            mimeType: "audio/pcm;rate=16000",
+            data: audioData
           }
-        };
-        console.log("[WS] audio packet desde cliente, bytes=" + Math.ceil(normalizedData.length * 3 / 4));
-        if (geminiWs.readyState === WS.OPEN) {
-          geminiWs.send(JSON.stringify(realTimeInput));
-        }
+        });
       } else if (reqMsg.type === "text" && reqMsg.data && reqMsg.data.trim()) {
-        const normalizedText = reqMsg.data.trim();
-        const realTimeInput = {
-          realtimeInput: {
-            parts: [{
-              text: normalizedText
-            }]
-          }
-        };
-        if (geminiWs.readyState === WS.OPEN) {
-          geminiWs.send(JSON.stringify(realTimeInput));
-        }
+        session.sendRealtimeInput({ text: reqMsg.data.trim() });
       }
     } catch (err: any) {
       console.error("[WS] Error parseando mensaje del cliente:", err.message);
@@ -1506,8 +1561,10 @@ wss.on("connection", (ws, request) => {
 
   ws.on("close", () => {
     console.log("[WS] Cliente de voz cerró conexión.");
-    if (geminiWs.readyState === WS.OPEN || geminiWs.readyState === WS.CONNECTING) {
-      geminiWs.close();
+    if (session) {
+      try {
+        session.close();
+      } catch (_) {}
     }
   });
 });
@@ -1542,19 +1599,46 @@ async function startServer() {
     console.log("Static file server active for production files.");
   }
 
-  server.listen(PORT, "0.0.0.0", () => {
-    console.log(`[VecindarioTransparente] Server running on port ${PORT}`);
-    console.log(`Access standard local service URL: http://localhost:${PORT}`);
-  });
+  const initialPort = Number(process.env.PORT || 3000);
+  const maxAttempts = 5;
+  let currentPort = initialPort;
 
-  server.on("error", (err: any) => {
-    if (err.code === "EADDRINUSE") {
-      console.error(`Error: el puerto ${PORT} ya está en uso. Usa otra instancia o ajusta PORT en tu entorno.`);
-    } else {
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    try {
+      await new Promise<void>((resolve, reject) => {
+        const onError = (err: any) => {
+          server.off("listening", onListening);
+          reject(err);
+        };
+        const onListening = () => {
+          server.off("error", onError);
+          resolve();
+        };
+
+        server.once("error", onError);
+        server.once("listening", onListening);
+        server.listen(currentPort, "0.0.0.0");
+      });
+
+      console.log(`[VecindarioTransparente] Server running on port ${currentPort}`);
+      console.log(`Access standard local service URL: http://localhost:${currentPort}`);
+      if (currentPort !== initialPort) {
+        console.log(`Nota: el puerto ${initialPort} estaba en uso, usando ${currentPort}.`);
+      }
+      return;
+    } catch (err: any) {
+      if (err.code === "EADDRINUSE") {
+        console.warn(`Advertencia: el puerto ${currentPort} ya está en uso. Intentando puerto ${currentPort + 1}...`);
+        currentPort += 1;
+        continue;
+      }
       console.error("Error inesperado al iniciar el servidor:", err);
+      process.exit(1);
     }
-    process.exit(1);
-  });
+  }
+
+  console.error(`No se pudo iniciar el servidor después de ${maxAttempts} intentos de puerto.`);
+  process.exit(1);
 }
 
 startServer();

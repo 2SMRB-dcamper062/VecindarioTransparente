@@ -850,8 +850,8 @@
             </div>
           </div>
 
-          <!-- User Brief -->
-          <div class="p-4 bg-slate-50/70 dark:bg-slate-950/40 border-b border-slate-150 dark:border-slate-800 flex items-center space-x-3">
+          <!-- User Brief - Click to open Profile -->
+          <div class="p-4 bg-slate-50/70 dark:bg-slate-950/40 border-b border-slate-150 dark:border-slate-800 flex items-center space-x-3 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all" @click="setTab('perfil')">
             <img :src="user?.avatarUrl" alt="Avatar" class="w-9 h-9 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-850" />
             <div class="overflow-hidden">
               <h4 class="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">{{ user?.name }}</h4>
@@ -862,6 +862,9 @@
                 </span>
               </div>
             </div>
+            <svg class="w-4 h-4 text-slate-400 ml-auto flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
           </div>
 
         <!-- System Navigation Tabs -->
@@ -1262,6 +1265,149 @@
             <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-500 flex items-start space-x-3">
               <span class="text-base">📅</span>
               <p class="leading-relaxed">Las remesas de las cuotas mensuales ordinarias se giran automáticamente mediante domiciliación bancaria ordinaria entre el día 1 y 5 de cada mes natural. Para reclamaciones, acuda a administración.</p>
+            </div>
+          </div>
+
+          <!-- ========================================== -->
+          <!--       TAB 1.5: PERFIL DE USUARIO          -->
+          <!-- ========================================== -->
+          <div v-if="activeTab === 'perfil'" class="space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-transparent">
+              <div>
+                <h3 class="text-xl font-bold text-slate-900 leading-none flex items-center gap-2">
+                  <span class="w-2 h-4 bg-slate-700 rounded-full"></span>
+                  Mi Perfil
+                </h3>
+                <p class="text-xs text-slate-500 mt-1">Personaliza tu perfil de usuario con nombre, foto de avatar, contacto y una breve descripción.</p>
+              </div>
+              <button @click="generateProfileAvatar"
+                      class="px-4 py-2 rounded-full bg-brand-600 text-white text-xs font-bold hover:bg-brand-700 transition">
+                🎨 Generar avatar aleatorio
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm text-center">
+                <img :src="profileForm.avatarUrl || user?.avatarUrl || 'https://api.dicebear.com/7.x/bottts/svg?seed=default'"
+                     alt="Avatar" class="mx-auto w-32 h-32 rounded-full border border-slate-200 object-cover mb-4" />
+                <div class="space-y-2">
+                  <p class="text-sm font-semibold text-slate-900">{{ profileForm.name || user?.name || 'Tu nombre' }}</p>
+                  <p class="text-xs text-slate-400">{{ profileForm.email || user?.email || 'tu@correo.com' }}</p>
+                  <p class="text-xs text-slate-500">{{ profileForm.bio || user?.bio || 'Describe brevemente quién eres en la comunidad.' }}</p>
+                  <p class="text-xs text-slate-500">{{ profileForm.phone || user?.phone || 'Teléfono de contacto' }}</p>
+                </div>
+              </div>
+
+              <div class="lg:col-span-2 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-[10px] uppercase text-slate-400 tracking-wide">Nombre completo</label>
+                    <input type="text" v-model="profileForm.name" placeholder="Tu nombre"
+                           class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] uppercase text-slate-400 tracking-wide">Correo electrónico</label>
+                    <input type="email" v-model="profileForm.email" placeholder="tu@correo.com"
+                           class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500" />
+                  </div>
+                  <div class="md:col-span-2">
+                    <label class="block text-[10px] uppercase text-slate-400 tracking-wide">URL de avatar</label>
+                    <input type="text" v-model="profileForm.avatarUrl" placeholder="https://..."
+                           class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] uppercase text-slate-400 tracking-wide">Teléfono</label>
+                    <input type="tel" v-model="profileForm.phone" placeholder="+34 600 123 456"
+                           class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] uppercase text-slate-400 tracking-wide">Biografía corta</label>
+                    <input type="text" v-model="profileForm.bio" placeholder="Soy parte activa de mi comunidad..."
+                           class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500" />
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+                  <div>
+                    <label class="block text-[10px] uppercase text-slate-400 tracking-wide">Contraseña actual</label>
+                    <input type="password" v-model="profileForm.currentPassword" placeholder="Contraseña actual"
+                           class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] uppercase text-slate-400 tracking-wide">Nueva contraseña</label>
+                    <input type="password" v-model="profileForm.newPassword" placeholder="Nueva contraseña"
+                           class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] uppercase text-slate-400 tracking-wide">Confirmar contraseña</label>
+                    <input type="password" v-model="profileForm.confirmPassword" placeholder="Confirmar nueva contraseña"
+                           class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500" />
+                  </div>
+                </div>
+
+                <div class="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div class="text-xs text-slate-500">Tus datos se guardarán en el servidor del portal y se usarán para tu identidad de usuario.</div>
+                  <button @click="updateProfile"
+                          class="w-full sm:w-auto px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl text-sm font-semibold transition">
+                    Guardar perfil
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Settings: Dark Mode, Language, Push Alerts -->
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+              <h4 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Preferencias
+              </h4>
+              <div class="space-y-4">
+                <!-- Dark Mode Toggle -->
+                <div class="flex items-center justify-between py-2">
+                  <div>
+                    <span class="text-sm font-medium text-slate-700">Modo oscuro</span>
+                    <p class="text-xs text-slate-400">Alternar tema claro/oscuro</p>
+                  </div>
+                  <button @click="toggleDarkMode" 
+                          class="relative w-11 h-6 rounded-full transition-colors cursor-pointer"
+                          :class="isDarkMode ? 'bg-brand-600' : 'bg-slate-300'">
+                    <span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform flex items-center justify-center text-[10px]"
+                          :class="isDarkMode ? 'translate-x-5' : ''">
+                      {{ isDarkMode ? '🌙' : '☀️' }}
+                    </span>
+                  </button>
+                </div>
+
+                <!-- Language Toggle -->
+                <div class="flex items-center justify-between py-2 border-t border-slate-100">
+                  <div>
+                    <span class="text-sm font-medium text-slate-700">Idioma</span>
+                    <p class="text-xs text-slate-400">{{ currentLang === 'es' ? 'Español' : 'English' }}</p>
+                  </div>
+                  <button @click="toggleLang"
+                          class="px-3 py-1.5 text-xs font-bold rounded-xl border transition cursor-pointer"
+                          :class="currentLang === 'es' ? 'bg-brand-50 border-brand-200 text-brand-700' : 'bg-sky-50 border-sky-200 text-sky-700'">
+                    🌐 {{ currentLang.toUpperCase() }}
+                  </button>
+                </div>
+
+                <!-- Push Notifications Toggle -->
+                <div class="flex items-center justify-between py-2 border-t border-slate-100">
+                  <div>
+                    <span class="text-sm font-medium text-slate-700">Alertas push</span>
+                    <p class="text-xs text-slate-400">{{ pushSubscribed ? 'Notificaciones activadas' : 'Recibe avisos de la comunidad' }}</p>
+                  </div>
+                  <button @click="subscribeToPushNotifications"
+                          class="px-3 py-1.5 text-xs font-bold rounded-xl border transition cursor-pointer"
+                          :class="pushSubscribed ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-50 border-slate-200 text-slate-500'">
+                    <span v-if="pushSubscribed">🔔 Activadas</span>
+                    <span v-else>🔕 Activar</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -2414,6 +2560,17 @@
           autoApproved: true
         });
 
+        const profileForm = reactive({
+          name: '',
+          email: '',
+          avatarUrl: '',
+          phone: '',
+          bio: '',
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        });
+
         const bookingForm = reactive({
           facilityName: '',
           date: '',
@@ -2641,6 +2798,56 @@
           showToast("Sesión cerrada correctamente. ¡Hasta pronto!", 'info');
         };
 
+        const initializeProfileForm = () => {
+          if (!user.value) return;
+          profileForm.name = user.value.name || '';
+          profileForm.email = user.value.email || '';
+          profileForm.avatarUrl = user.value.avatarUrl || '';
+          profileForm.phone = user.value.phone || '';
+          profileForm.bio = user.value.bio || '';
+          profileForm.currentPassword = '';
+          profileForm.newPassword = '';
+          profileForm.confirmPassword = '';
+        };
+
+        const generateProfileAvatar = () => {
+          const seed = Math.random().toString(36).substring(2, 10);
+          profileForm.avatarUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${seed}`;
+          showToast('Avatar actualizado. Guarda los cambios para aplicarlo.', 'success');
+        };
+
+        const updateProfile = async () => {
+          try {
+            if (profileForm.newPassword && !profileForm.currentPassword) {
+              throw new Error('Debes ingresar tu contraseña actual para cambiar la contraseña.');
+            }
+            if (profileForm.newPassword && profileForm.newPassword !== profileForm.confirmPassword) {
+              throw new Error('La nueva contraseña no coincide.');
+            }
+
+            const payload = {
+              name: profileForm.name,
+              email: profileForm.email,
+              avatarUrl: profileForm.avatarUrl,
+              bio: profileForm.bio,
+              phone: profileForm.phone,
+              currentPassword: profileForm.currentPassword || undefined,
+              newPassword: profileForm.newPassword || undefined
+            };
+
+            const data = await apiFetch('/api/auth/profile', {
+              method: 'PUT',
+              body: JSON.stringify(payload)
+            });
+
+            user.value = data.user;
+            initializeProfileForm();
+            showToast(data.message || 'Perfil actualizado correctamente.', 'success');
+          } catch (e) {
+            showToast(e.message, 'error');
+          }
+        };
+
         const submitSuperCommunity = async () => {
           try {
             if (!superCommunityForm.name.trim() || !superCommunityForm.address.trim()) {
@@ -2728,6 +2935,7 @@
             user.value = session.user;
             community.value = session.community;
             myProperty.value = session.property;
+            initializeProfileForm();
 
             // Auto-switch default tab depending on role
             if (session.user.role === 'superadmin') {
@@ -2767,7 +2975,10 @@
             }
 
             // Regular tabs fetching
-            if (activeTab.value === 'recibos') {
+            if (activeTab.value === 'perfil') {
+              initializeProfileForm();
+              return;
+            } else if (activeTab.value === 'recibos') {
               const prop = await apiFetch('/api/properties/my');
               myProperty.value = prop;
             } else if (activeTab.value === 'finanzas') {
@@ -3697,6 +3908,12 @@
           approveUser,
           emitMassReceipt,
           broadcastPushAlert,
+
+          // Profile
+          profileForm,
+          generateProfileAvatar,
+          updateProfile,
+          initializeProfileForm,
 
           // Operations
           handleLogin,

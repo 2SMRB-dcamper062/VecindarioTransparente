@@ -10,6 +10,8 @@ export interface User {
   email: string;
   passwordHash: string;
   avatarUrl?: string;
+  bio?: string;
+  phone?: string;
   role?: string;
   status?: string;
   communityId?: string;
