@@ -22,8 +22,8 @@ export interface CastVote { userId: string; userName: string; option: string; ti
 export interface Vote { _id: string; title: string; description: string; status: string; options: string[]; castVotes: CastVote[]; communityId?: string; createdDate?: string; endDate?: string }
 export interface Finance { _id: string; type: string; concept: string; amount: number; date: string; invoiceUrl?: string; communityId?: string }
 export interface Booking { _id: string; facilityName: string; date: string; startTime: string; endTime: string; propertyId?: string; propertyName?: string; communityId?: string }
-export interface Issue { _id: string; title: string; description: string; category?: string; photo?: string; status?: string; reporterName?: string; reporterProperty?: string; date?: string; communityId?: string }
-export interface PushSubscriptionItem { endpoint: string; keys: { p256dh: string; auth: string } }
+export interface Issue { _id: string; title: string; description: string; category?: string; photo?: string; photoUrl?: string; status?: string; reporterName?: string; reporterProperty?: string; date?: string; communityId?: string }
+export interface PushSubscriptionItem { _id?: string; userId?: string; communityId?: string; endpoint: string; keys: { p256dh: string; auth: string } }
 
 type DBShape = {
   users: User[];

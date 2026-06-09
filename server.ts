@@ -9,6 +9,7 @@ import cors from "cors";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import http from "http";
+import multer from "multer";
 import { WebSocketServer, WebSocket as WS } from "ws";
 import { createServer as createViteServer } from "vite";
 import { dbSource, User, Community, Property, Vote, Finance, Booking, CastVote, PropertyHistoryItem, Issue, PushSubscriptionItem } from "./src/db/localDb.js";
@@ -18,7 +19,7 @@ import { GoogleGenAI } from "@google/genai";
 // Optional real Mongoose connection logic for MongoDB Atlas
 import mongoose from "mongoose";
 
-const PORT = 3000;
+const PORT = Number(process.env.PORT || 3000);
 const JWT_SECRET = process.env.JWT_SECRET || "vecindario-transparente-secret-2026";
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -179,6 +180,17 @@ app.use(cors());
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
+// Multer file upload error handling
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  if (err instanceof multer.MulterError) {
+    return res.status(400).json({ error: err.message });
+  }
+  if (err && typeof err.message === "string" && err.message.includes("Sólo se permiten archivos de imagen")) {
+    return res.status(400).json({ error: err.message });
+  }
+  next(err);
+});
+
 // Logger middleware
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
@@ -193,7 +205,22 @@ interface AuthRequest extends Request {
     role: "superadmin" | "admin" | "owner" | "tenant";
     communityId?: string;
   };
+  file?: Express.Multer.File;
 }
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5 MB máximo por imagen
+  },
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith("image/")) {
+      cb(new Error("Sólo se permiten archivos de imagen para el reporte de incidencias."));
+      return;
+    }
+    cb(null, true);
+  }
+});
 
 // Security Authentication Middleware
 const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction): void => {
@@ -982,7 +1009,12 @@ app.get("/api/issues", authenticateToken, (req: AuthRequest, res) => {
     return;
   }
   
-  const list = dbSource.getIssues().filter(i => i.communityId === req.user?.communityId);
+  const list = dbSource.getIssues()
+    .filter(i => i.communityId === req.user?.communityId)
+    .map((issue) => ({
+      ...issue,
+      photoUrl: issue.photoUrl || issue.photo || ""
+    }));
   // Return issues sorted by date (newest first)
   res.json(list.sort((a, b) => b.date.localeCompare(a.date)));
 });
@@ -994,13 +1026,26 @@ const handleIncidentSubmission = async (req: AuthRequest, res: any) => {
       res.status(401).json({ error: "No autorizado." });
       return;
     }
+
+    console.log("[Incident Debug] req.body=", req.body);
+    console.log("[Incident Debug] req.file=", req.file ? { originalname: req.file.originalname, mimetype: req.file.mimetype, size: req.file.size } : null);
     
-    const { title, description, category, photo } = req.body;
+    const { title, description, category } = req.body;
+    let photo = req.body.photo;
     if (!title || !description || !category) {
       res.status(400).json({ error: "Título, descripción y categoría son requeridos para reportar una incidencia." });
       return;
     }
-    
+
+    if (req.file) {
+      const mimeType = req.file.mimetype;
+      if (!mimeType.startsWith("image/")) {
+        res.status(400).json({ error: "Sólo se permiten archivos de imagen en el reporte." });
+        return;
+      }
+      photo = `data:${mimeType};base64,${req.file.buffer.toString("base64")}`;
+    }
+
     // Validate Base64 image integrity safely if provided
     if (photo && typeof photo === "string" && photo.length > 0) {
       if (!photo.startsWith("data:image/")) {
@@ -1018,7 +1063,8 @@ const handleIncidentSubmission = async (req: AuthRequest, res: any) => {
       title,
       description,
       category,
-      photo: photo || "", // base64 binary
+      photo: photo || "",
+      photoUrl: photo || "",
       status: "pendiente",
       reporterName: userObj?.name || req.user.username,
       reporterProperty: propStr,
@@ -1044,8 +1090,8 @@ const handleIncidentSubmission = async (req: AuthRequest, res: any) => {
   }
 };
 
-app.post("/api/issues", authenticateToken, handleIncidentSubmission);
-app.post("/api/incidents", authenticateToken, handleIncidentSubmission);
+app.post("/api/issues", authenticateToken, upload.single("photo"), handleIncidentSubmission);
+app.post("/api/incidents", authenticateToken, upload.single("photo"), handleIncidentSubmission);
 
 // 6. Update Issue Status (Admin only)
 app.put("/api/issues/:id/status", authenticateToken, async (req: AuthRequest, res) => {
@@ -1339,7 +1385,7 @@ wss.on("connection", (ws, request) => {
   }
 
   // Connect to Gemini Live bidirectional WebSocket
-  const geminiUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidirectionalGenerateContent?key=${apiKey}`;
+  const geminiUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1.GenerativeService.BidiGenerateContent?key=${apiKey}`;
   const geminiWs = new WS(geminiUrl);
 
   geminiWs.on("open", () => {
@@ -1347,13 +1393,13 @@ wss.on("connection", (ws, request) => {
     // Send initial configuration message
     const setupMsg = {
       setup: {
-        model: "models/gemini-2.0-flash-exp",
+        model: "gemini-live-2.5-flash-preview",
         generationConfig: {
           responseModalities: ["AUDIO"],
           speechConfig: {
             voiceConfig: {
               prebuiltVoiceConfig: {
-                voiceName: "Aoede" // beautiful friendly voice
+                voiceName: "Aoede" // friendly voice
               }
             }
           }
@@ -1406,7 +1452,7 @@ wss.on("connection", (ws, request) => {
   geminiWs.on("error", (err) => {
     console.error("[WS] Error de Gemini WS: ", err.message);
     try {
-      ws.send(JSON.stringify({ type: "error", error: "Error de red directo con la API de Gemini." }));
+      ws.send(JSON.stringify({ type: "error", error: `Error de red directo con la API de Gemini: ${err.message}` }));
     } catch (_) {}
   });
 
@@ -1427,12 +1473,13 @@ wss.on("connection", (ws, request) => {
         const normalizedData = reqMsg.data.trim();
         const realTimeInput = {
           realtimeInput: {
-            mediaChunks: [{
+            audio: {
               mimeType: "audio/pcm;rate=16000",
               data: normalizedData
-            }]
+            }
           }
         };
+        console.log("[WS] audio packet desde cliente, bytes=" + Math.ceil(normalizedData.length * 3 / 4));
         if (geminiWs.readyState === WS.OPEN) {
           geminiWs.send(JSON.stringify(realTimeInput));
         }
@@ -1498,6 +1545,15 @@ async function startServer() {
   server.listen(PORT, "0.0.0.0", () => {
     console.log(`[VecindarioTransparente] Server running on port ${PORT}`);
     console.log(`Access standard local service URL: http://localhost:${PORT}`);
+  });
+
+  server.on("error", (err: any) => {
+    if (err.code === "EADDRINUSE") {
+      console.error(`Error: el puerto ${PORT} ya está en uso. Usa otra instancia o ajusta PORT en tu entorno.`);
+    } else {
+      console.error("Error inesperado al iniciar el servidor:", err);
+    }
+    process.exit(1);
   });
 }
 

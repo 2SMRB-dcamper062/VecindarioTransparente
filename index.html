@@ -1796,8 +1796,7 @@
                       
                       <!-- Evidence thumbnail -->
                       <div class="w-full md:w-32 h-24 flex-shrink-0 bg-slate-200 rounded-lg overflow-hidden border border-slate-300 flex items-center justify-center">
-                        <img v-if="iss.photoUrl" :src="iss.photoUrl" class="w-full h-full object-cover" />
-                        <span v-else class="text-xs text-slate-400 font-semibold font-mono">Sin Imagen</span>
+                          <img v-if="iss.photoUrl || iss.photo" :src="iss.photoUrl || iss.photo" class="w-full h-full object-cover" />
                       </div>
 
                       <div class="flex-grow space-y-1.5">
@@ -2365,7 +2364,8 @@
           title: '',
           description: '',
           category: 'otros',
-          photo: ''
+          photo: '',
+          photoFile: null
         });
         
         // Extended Admin forms
@@ -2511,17 +2511,17 @@
 
         // API Requests Client helper
         const apiFetch = async (endpoint, options = {}) => {
-          const headers = {
-            'Content-Type': 'application/json',
+          const baseHeaders = {
             ...(token.value ? { 'Authorization': `Bearer ${token.value}` } : {})
           };
 
+          const headers = options.body instanceof FormData
+            ? { ...baseHeaders, ...options.headers }
+            : { 'Content-Type': 'application/json', ...baseHeaders, ...options.headers };
+
           const config = {
             ...options,
-            headers: {
-              ...headers,
-              ...options.headers
-            }
+            headers
           };
 
           try {
@@ -3147,6 +3147,7 @@
           const reader = new FileReader();
           reader.onload = (e) => {
             issueForm.photo = e.target.result;
+            issueForm.photoFile = file;
             showToast("📸 ¡Evidencia fotográfica cargada correctamente!", "success");
           };
           reader.readAsDataURL(file);
@@ -3158,17 +3159,28 @@
               throw new Error("Agregue un título y una descripción de la incidencia.");
             }
 
-            const res = await apiFetch('/api/issues', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
+            let body;
+            let headers = {};
+            if (issueForm.photoFile) {
+              body = new FormData();
+              body.append('title', issueForm.title);
+              body.append('description', issueForm.description);
+              body.append('category', issueForm.category);
+              body.append('photo', issueForm.photoFile);
+            } else {
+              body = JSON.stringify({
                 title: issueForm.title,
                 description: issueForm.description,
                 category: issueForm.category,
                 photo: issueForm.photo
-              })
+              });
+              headers['Content-Type'] = 'application/json';
+            }
+
+            const res = await apiFetch('/api/issues', {
+              method: 'POST',
+              headers,
+              body
             });
 
             showToast(res.message, 'success');
@@ -3178,6 +3190,7 @@
             issueForm.description = '';
             issueForm.category = 'otros';
             issueForm.photo = '';
+            issueForm.photoFile = null;
 
             // re-fetch issues
             await fetchTabContent();
