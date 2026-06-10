@@ -140,7 +140,7 @@
     .dark .shadow-sm, .dark .shadow-md, .dark .shadow-xl {
       box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 2px 8px -1px rgba(0, 0, 0, 0.3) !important;
     }
-    .dark .text-slate-705 {
+    .dark .text-slate-700 {
       color: #eaeaea !important;
     }
     .dark .bg-slate-300 {
@@ -323,7 +323,7 @@
 
             <!-- Pilar Votaciones Digitales -->
             <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/70 shadow-sm hover:shadow-md transition-shadow">
-              <div class="bg-brand-100 text-brand-750 p-3 rounded-2xl w-12 h-12 flex items-center justify-center mb-4 sm:mb-6">
+              <div class="bg-brand-100 text-brand-700 p-3 rounded-2xl w-12 h-12 flex items-center justify-center mb-4 sm:mb-6">
                 <!-- Check vote Vector Icon -->
                 <svg class="w-6 h-6 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
@@ -602,13 +602,13 @@
     <!-- ========================================== -->
     <!--          PRIVATE DASHBOARD VECINAL         -->
     <!-- ========================================== -->
-    <div v-else class="flex-grow flex flex-col h-screen overflow-hidden bg-slate-105">
+    <div class="flex-grow flex flex-col h-screen overflow-hidden bg-slate-100">
       
       <!-- CASE 1: SUPER-ADMIN COMPREHENSIVE CONTROL CENTER -->
       <div v-if="user?.role === 'superadmin'" class="flex-grow flex flex-col md:flex-row h-full w-full overflow-hidden bg-slate-50">
         <!-- Sidebar -->
-        <aside class="w-full md:w-64 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col flex-shrink-0 border-r border-slate-250 dark:border-slate-800">
-          <div class="p-6 border-b border-slate-150 dark:border-slate-800">
+        <aside class="w-full md:w-64 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col flex-shrink-0 border-r border-slate-200 dark:border-slate-800">
+          <div class="p-6 border-b border-slate-100 dark:border-slate-800">
             <div class="flex items-center gap-3 text-brand-600 dark:text-brand-400 font-bold text-lg">
               <div class="bg-white rounded-xl shadow-md border-2 border-brand-200 flex items-center justify-center">
                 <img src="/assets/logo.png" alt="VecindarioTransparente Logo" class="h-5 w-5 object-contain" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCAyNCAyNCIgc3Ryb2tlPSIjN2MzYWVkIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZD0iTTE5IDIxVjVhMiAyIDAgMDAtMi0ySDdhMiAyIDAgMDAtMiAydjE2bTQgMGgtMm0tMiAwaC01bTktMEgzbTIgMGg1TTkgN2gxbS0xIDRoMW00LTRoMW0tMSA0aDFtLTUgMTB2LTVhMSAxIDAgMDExLTFoMmExIDEgMCAwMTEgMXY1bTQtMGg0Ii8+PC9zdmc+';" />
@@ -616,8 +616,8 @@
               <span>SuperAdmin <span class="text-slate-900 dark:text-white font-extrabold">VT</span></span>
             </div>
           </div>
-          <div class="p-4 bg-slate-50/70 dark:bg-slate-950/40 border-b border-slate-150 dark:border-slate-800 flex items-center space-x-3">
-            <img :src="user?.avatarUrl" class="w-9 h-9 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-850" />
+          <div class="p-4 bg-slate-50/70 dark:bg-slate-950/40 border-b border-slate-100 dark:border-slate-800 flex items-center space-x-3">
+            <img :src="user?.avatarUrl" class="w-9 h-9 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800" />
             <div class="overflow-hidden">
               <h4 class="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">{{ user?.name }}</h4>
               <span class="text-[9px] text-brand-600 dark:text-brand-400 font-bold uppercase font-mono tracking-wider">Team Corporativo</span>
@@ -635,9 +635,9 @@
               👥 Directorio de Vecinos
             </button>
           </nav>
-          <div class="p-4 border-t border-slate-150 dark:border-slate-800">
+          <div class="p-4 border-t border-slate-100 dark:border-slate-800">
             <button @click="handleLogout" 
-                    class="w-full flex items-center justify-center py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold text-rose-650 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:text-rose-600 transition-all cursor-pointer">
+                    class="w-full flex items-center justify-center py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:text-rose-600 transition-all cursor-pointer">
               Cerrar Sesión Base
             </button>
           </div>
@@ -648,10 +648,10 @@
           <header class="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between flex-shrink-0">
             <span class="text-sm font-bold text-slate-800 font-mono uppercase">Control de Infraestructura de Vecindarios</span>
             <div class="flex items-center space-x-3">
-              <button @click="toggleLang" class="px-2.5 py-1 text-xs font-bold rounded-xl bg-slate-105 hover:bg-slate-200 border cursor-pointer text-slate-700">
+              <button @click="toggleLang" class="px-2.5 py-1 text-xs font-bold rounded-xl bg-slate-100 hover:bg-slate-200 border cursor-pointer text-slate-700">
                 🌐 {{ currentLang.toUpperCase() }}
               </button>
-              <button @click="toggleDarkMode" class="p-2 rounded-xl bg-slate-105 hover:bg-slate-200 border cursor-pointer text-slate-700">
+              <button @click="toggleDarkMode" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 border cursor-pointer text-slate-700">
                 <span v-if="isDarkMode">☀️</span><span v-else>🌙</span>
               </button>
             </div>
@@ -660,7 +660,7 @@
           <div class="flex-grow p-6 overflow-y-auto bg-slate-50 scrollbar-thin">
             
             <!-- tab fincas_global -->
-            <div v-slot="activeTab" v-if="activeTab === 'fincas_global'" class="space-y-6">
+            <div v-if="activeTab === 'fincas_global'" class="space-y-6">
               <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                 <div>
                   <h3 class="text-lg font-bold text-slate-900 leading-tight">Comunidades Activas</h3>
@@ -682,7 +682,7 @@
                       </div>
                       <div>
                         <h4 class="font-bold text-slate-900 text-sm leading-tight">{{ com.name }}</h4>
-                        <p class="text-[10px] text-slate-450 mt-0.5">ID: {{ com._id }}</p>
+                        <p class="text-[10px] text-slate-400 mt-0.5">ID: {{ com._id }}</p>
                       </div>
                     </div>
                     <p class="text-xs text-slate-600 mt-4 leading-normal">
@@ -836,7 +836,7 @@
             <p class="text-xs text-slate-500 mt-2">Hola, <span class="font-semibold text-slate-700 dark:text-slate-300">{{ user?.name || 'Vecino/a' }}</span>.</p>
           </div>
 
-          <div class="p-5 bg-indigo-50/50 dark:bg-indigo-950/20 rounded-2xl border border-indigo-100 dark:border-indigo-900 text-xs text-slate-650 dark:text-slate-350 leading-relaxed text-left space-y-2">
+          <div class="p-5 bg-indigo-50/50 dark:bg-indigo-950/20 rounded-2xl border border-indigo-100 dark:border-indigo-900 text-xs text-slate-600 dark:text-slate-300 leading-relaxed text-left space-y-2">
             <p>📍 Tu registro en la comunidad de <strong>{{ community?.name || 'la urbanización' }}</strong> se ha realizado correctamente.</p>
             <p>🏠 Tu cuenta está unida correspondientemente a la vivienda: <span class="font-bold underline text-indigo-600 dark:text-indigo-400">Planta {{ myProperty?.floor || '—' }}, Puerta {{ myProperty?.door || '—' }} (Bloque {{ myProperty?.block || '—' }})</span>.</p>
             <p class="text-amber-600 dark:text-amber-400 font-bold mt-2">⚙️ Por favor, espera a que el Administrador / Presidente de tu comunidad apruebe tu acceso para ver el portal completo.</p>
@@ -844,11 +844,11 @@
 
           <!-- DEMO PASS AND ACTIONS -->
           <div class="pt-5 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2.5">
-            <button @click="handleSelfApprove" class="w-full py-3 bg-gradient-to-r from-violet-650 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-bold rounded-xl text-xs shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition transform active:scale-95 cursor-pointer">
+            <button @click="handleSelfApprove" class="w-full py-3 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-bold rounded-xl text-xs shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition transform active:scale-95 cursor-pointer">
               ⚡ Omitir Espera: Aprobar Cuenta al Instante (Modo Demo)
             </button>
             
-            <button @click="loadDashboardData" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs transition cursor-pointer">
+            <button @click="loadDashboardData" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs transition cursor-pointer">
               🔄 Volver a comprobar estado
             </button>
             <button @click="handleLogout" class="w-full py-2.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-bold rounded-xl text-xs transition cursor-pointer">
@@ -862,9 +862,9 @@
       <div v-else class="flex-grow flex flex-col md:flex-row h-full w-full overflow-hidden bg-slate-100">
         
         <!-- Panel Sidebar (Desktop) / Header (Mobile) -->
-        <aside class="w-full md:w-64 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col flex-shrink-0 border-r border-slate-250 dark:border-slate-800">
+        <aside class="w-full md:w-64 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col flex-shrink-0 border-r border-slate-200 dark:border-slate-800">
           <!-- Brand / Identity -->
-          <div class="p-6 border-b border-slate-150 dark:border-slate-800">
+          <div class="p-6 border-b border-slate-100 dark:border-slate-800">
             <div class="flex items-center gap-3 text-brand-600 dark:text-brand-400 font-bold text-lg animate-fade-in">
               <div class="bg-white rounded-xl shadow-md border-2 border-brand-200 flex items-center justify-center">
                 <img src="/assets/logo.png" alt="VecindarioTransparente Logo" class="h-5 w-5 object-contain" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCAyNCAyNCIgc3Ryb2tlPSIjN2MzYWVkIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZD0iTTE5IDIxVjVhMiAyIDAgMDAtMi0ySDdhMiAyIDAgMDAtMiAydjE2bTQgMGgtMm0tMiAwaC01bTktMEgzbTIgMGg1TTkgN2gxbS0xIDRoMW00LTRoMW0tMSA0aDFtLTUgMTB2LTVhMSAxIDAgMDExLTFoMmExIDEgMCAwMTEgMXY1bTQtMGg0Ii8+PC9zdmc+';" />
@@ -876,8 +876,8 @@
           </div>
 
           <!-- User Brief - Click to open Profile -->
-          <div class="p-4 bg-slate-50/70 dark:bg-slate-950/40 border-b border-slate-150 dark:border-slate-800 flex items-center space-x-3 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all" @click="setTab('perfil')">
-            <img :src="user?.avatarUrl" alt="Avatar" class="w-9 h-9 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-850" />
+          <div class="p-4 bg-slate-50/70 dark:bg-slate-950/40 border-b border-slate-100 dark:border-slate-800 flex items-center space-x-3 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all" @click="setTab('perfil')">
+            <img :src="user?.avatarUrl" alt="Avatar" class="w-9 h-9 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800" />
             <div class="overflow-hidden">
               <h4 class="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">{{ user?.name }}</h4>
               <div class="flex items-center space-x-1.5 mt-0.5">
@@ -944,7 +944,7 @@
           <div v-if="user?.role === 'presidente' || user?.role === 'admin'" class="pt-5 border-t border-slate-200 dark:border-slate-800 mt-5 animate-fade-in">
             <span class="block px-3.5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 font-mono">Panel Presidencial</span>
             <button @click="setTab('administrar')" 
-                    class="w-full flex items-center px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 cursor-pointer text-amber-650"
+                    class="w-full flex items-center px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 cursor-pointer text-amber-600"
                     :class="activeTab === 'administrar' ? 'bg-amber-500 text-white shadow-md shadow-amber-500/15' : 'text-amber-600 dark:text-amber-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'">
               <svg class="w-4 h-4 mr-2.5 text-amber-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -956,9 +956,9 @@
         </nav>
 
         <!-- Log out button -->
-        <div class="p-4 border-t border-slate-150 dark:border-slate-800">
+        <div class="p-4 border-t border-slate-100 dark:border-slate-800">
           <button @click="handleLogout" 
-                  class="w-full flex items-center justify-center py-2.5 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold text-rose-650 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:text-rose-600 transition-all cursor-pointer">
+                  class="w-full flex items-center justify-center py-2.5 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:text-rose-600 transition-all cursor-pointer">
             <svg class="w-4 h-4 mr-2 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
@@ -983,7 +983,7 @@
 
           <div class="flex items-center space-x-3.5">
             <!-- Invite code badge -->
-            <div class="hidden lg:flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-orange-50 border border-orange-200 text-xs text-orange-850 font-medium">
+            <div class="hidden lg:flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-orange-50 border border-orange-200 text-xs text-orange-800 font-medium">
               <span>{{ t('general.inviteCode') }}</span>
               <span class="font-mono font-bold tracking-wider">{{ community ? community.inviteCode : 'ALAMEDA2026' }}</span>
             </div>
@@ -993,10 +993,10 @@
               <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
-              <span class="text-xs font-bold text-slate-700 dark:text-slate-250 font-mono" v-if="myProperty">
+              <span class="text-xs font-bold text-slate-700 dark:text-slate-200 font-mono" v-if="myProperty">
                 B-{{ myProperty.block }} - {{ myProperty.floor }}º {{ myProperty.door }}
               </span>
-              <span class="text-xs font-bold text-slate-705" v-else>Presidente</span>
+              <span class="text-xs font-bold text-slate-700" v-else>Presidente</span>
             </div>
           </div>
         </header>
@@ -1375,7 +1375,7 @@
               <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"
                    :class="financeSummary.balance >= 0 ? 'bg-gradient-to-br from-white to-emerald-50/25' : 'bg-gradient-to-br from-white to-rose-50/25'">
                 <div>
-                  <span class="block text-[10px] uppercase font-bold text-slate-450">Fondo Común Disponible</span>
+                  <span class="block text-[10px] uppercase font-bold text-slate-400">Fondo Común Disponible</span>
                   <span class="text-2xl font-black mt-1 block font-mono"
                         :class="financeSummary.balance >= 0 ? 'text-brand-600' : 'text-rose-600'">
                     {{ financeSummary.balance.toFixed(2) }} €
@@ -1393,7 +1393,7 @@
             <!-- Tabla de movimientos y auditoría de facturas -->
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
               <div class="px-5 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-                <span class="text-xs font-bold text-slate-705 uppercase tracking-wider">Libro de Caja y de Conciliación de Cuentas</span>
+                <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Libro de Caja y de Conciliación de Cuentas</span>
                 <span class="text-xs text-slate-500 font-medium">Actualizado: hace unos instantes</span>
               </div>
 
@@ -1520,7 +1520,7 @@
 
                   <!-- Real-time Results Graph if castVotes exist -->
                   <div class="mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200/60 text-xs space-y-3">
-                    <span class="block text-[10px] font-bold text-slate-450 uppercase tracking-widest leading-none mb-1">Escrutinio Directo</span>
+                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Escrutinio Directo</span>
                     
                     <div v-if="vote.castVotes.length === 0" class="text-slate-400 text-center py-2 italic text-[11px]">
                       Aún no hay sufragios registrados para esta votación.
@@ -1568,22 +1568,22 @@
                       <span class="block text-[10px] text-slate-400 text-center font-bold uppercase mb-2">Seleccione una opción para emitir su sufragio</span>
                       <div class="grid grid-cols-3 gap-2">
                         <button @click="castMyVote(vote._id, 'A Favor')" 
-                                class="py-2 px-1 text-center font-bold bg-white text-emerald-600 border border-emerald-250 hover:bg-emerald-50 rounded-xl text-[11px] transition duration-150 active:scale-95 cursor-pointer">
+                                class="py-2 px-1 text-center font-bold bg-white text-emerald-600 border border-emerald-200 hover:bg-emerald-50 rounded-xl text-[11px] transition duration-150 active:scale-95 cursor-pointer">
                           A Favor
                         </button>
                         <button @click="castMyVote(vote._id, 'En Contra')" 
-                                class="py-2 px-1 text-center font-bold bg-white text-rose-600 border border-rose-250 hover:bg-rose-50 rounded-xl text-[11px] transition duration-150 active:scale-95 cursor-pointer">
+                                class="py-2 px-1 text-center font-bold bg-white text-rose-600 border border-rose-200 hover:bg-rose-50 rounded-xl text-[11px] transition duration-150 active:scale-95 cursor-pointer">
                           En Contra
                         </button>
                         <button @click="castMyVote(vote._id, 'Abstention')" 
-                                class="py-2 px-1 text-center font-bold bg-white text-slate-500 border border-slate-250 hover:bg-slate-50 rounded-xl text-[11px] transition duration-150 active:scale-95 cursor-pointer">
+                                class="py-2 px-1 text-center font-bold bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 rounded-xl text-[11px] transition duration-150 active:scale-95 cursor-pointer">
                           Abstenerse
                         </button>
                       </div>
                     </div>
                   </div>
                   <div v-else class="text-center py-2 text-slate-400 text-xs font-semibold italic flex items-center justify-center space-x-1">
-                    <svg class="w-4 h-4 text-slate-350" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                     <span>Votación concluida. Resolución final vinculante.</span>
@@ -1625,7 +1625,7 @@
                   <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase">Instalación Común</label>
                     <select v-model="bookingForm.facilityName" required
-                            class="mt-1 w-full px-3 py-2.5 rounded-xl border border-slate-200 outline-none text-xs bg-white text-slate-750 focus:border-brand-500">
+                            class="mt-1 w-full px-3 py-2.5 rounded-xl border border-slate-200 outline-none text-xs bg-white text-slate-700 focus:border-brand-500">
                       <option value="" disabled>Seleccione de la lista...</option>
                       <option value="Pista de Pádel">🎾 Pista de Pádel</option>
                       <option value="Piscina">🏊 Piscina Comunitaria</option>
@@ -1636,7 +1636,7 @@
                   <div>
                     <label class="block text-xs font-semibold text-slate-400 uppercase">Fecha de Reserva</label>
                     <input type="date" v-model="bookingForm.date" required :min="getTodayString()"
-                           class="mt-1 w-full px-3 py-2.5 rounded-xl border border-slate-200 outline-none text-xs text-slate-850 focus:border-brand-500 font-mono" />
+                           class="mt-1 w-full px-3 py-2.5 rounded-xl border border-slate-200 outline-none text-xs text-slate-800 focus:border-brand-500 font-mono" />
                   </div>
 
                   <div class="grid grid-cols-2 gap-3">
@@ -1685,7 +1685,7 @@
               <div class="lg:col-span-7 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
                 <div class="space-y-4">
                   <div class="flex items-center justify-between border-b pb-2">
-                    <span class="text-xs font-bold text-slate-705 uppercase tracking-wide">📅 Reservas en Curso esta semana</span>
+                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wide">📅 Reservas en Curso esta semana</span>
                     <span class="text-[10px] text-slate-400 font-medium">Auto-ordenado</span>
                   </div>
 
@@ -1702,8 +1702,8 @@
                         <div class="p-2.5 rounded-lg text-xs"
                              :class="[
                                book.facilityName === 'Pista de Pádel' ? 'bg-amber-100 text-amber-800' : '',
-                               book.facilityName === 'Piscina' ? 'bg-sky-100 text-sky-850' : '',
-                               book.facilityName === 'Salón Social' ? 'bg-purple-100 text-purple-850' : '',
+                               book.facilityName === 'Piscina' ? 'bg-sky-100 text-sky-800' : '',
+                               book.facilityName === 'Salón Social' ? 'bg-purple-100 text-purple-800' : '',
                              ]">
                           {{ book.facilityName === 'Pista de Pádel' ? '🎾' : book.facilityName === 'Piscina' ? '🏊' : '🏢' }}
                         </div>
@@ -1765,7 +1765,7 @@
                   <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase">Título de la Incidencia</label>
                     <input type="text" v-model="issueForm.title" placeholder="Ej. Filtración de agua en parking -1" required
-                           class="mt-1 w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white font-medium outline-none text-xs text-slate-850 focus:border-red-500" />
+                           class="mt-1 w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white font-medium outline-none text-xs text-slate-800 focus:border-red-500" />
                   </div>
 
                   <div>
@@ -1818,7 +1818,7 @@
               <div class="lg:col-span-8 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
                 <div>
                   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b pb-3 mb-4">
-                    <span class="text-xs font-bold text-slate-705 uppercase tracking-wide">📋 Registro General de Reparaciones</span>
+                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wide">📋 Registro General de Reparaciones</span>
                     
                     <!-- Filters pills -->
                     <div class="flex flex-wrap gap-1.5">
@@ -1834,7 +1834,7 @@
                       </button>
                       <button @click="issuesFilter = 'en_proceso'" 
                               class="px-2.5 py-1 text-[10px] font-bold rounded-lg transition"
-                              :class="issuesFilter === 'en_proceso' ? 'bg-sky-600 text-white' : 'bg-sky-50 hover:bg-sky-100 text-sky-850'">
+                              :class="issuesFilter === 'en_proceso' ? 'bg-sky-600 text-white' : 'bg-sky-50 hover:bg-sky-100 text-sky-800'">
                         En Proceso
                       </button>
                       <button @click="issuesFilter = 'resuelto'" 
@@ -1852,7 +1852,7 @@
                     </div>
 
                     <div v-for="iss in filteredIssues" :key="iss._id" 
-                         class="p-4 rounded-xl border border-slate-200/70 bg-slate-50 p-4 transition-all duration-300 hover:border-slate-350 flex flex-col md:flex-row gap-4 justify-between items-start">
+                         class="p-4 rounded-xl border border-slate-200/70 bg-slate-50 p-4 transition-all duration-300 hover:border-slate-300 flex flex-col md:flex-row gap-4 justify-between items-start">
                       
                       <!-- Evidence thumbnail -->
                       <div class="w-full md:w-32 h-24 flex-shrink-0 bg-slate-200 rounded-lg overflow-hidden border border-slate-300 flex items-center justify-center">
@@ -1875,9 +1875,9 @@
                           <!-- Current Status Badge -->
                           <span class="px-2 py-0.5 rounded text-[9px] font-extrabold uppercase"
                                 :class="[
-                                  iss.status === 'pendiente' ? 'bg-yellow-100 text-yellow-850 border border-yellow-200' : '',
-                                  iss.status === 'en_proceso' ? 'bg-cyan-100 text-cyan-850 border border-cyan-200' : '',
-                                  iss.status === 'resuelto' ? 'bg-emerald-100 text-emerald-800 border border-emerald-250' : '',
+                                  iss.status === 'pendiente' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' : '',
+                                  iss.status === 'en_proceso' ? 'bg-cyan-100 text-cyan-800 border border-cyan-200' : '',
+                                  iss.status === 'resuelto' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : '',
                                 ]">
                             {{ iss.status === 'resuelto' ? 'resuelta' : iss.status }}
                           </span>
@@ -2000,7 +2000,7 @@
                   <!-- Quick configuration edits -->
                   <div class="space-y-3.5">
                     <div>
-                      <label class="block text-[11px] font-bold text-slate-450 uppercase">Estado General Saneado</label>
+                      <label class="block text-[11px] font-bold text-slate-400 uppercase">Estado General Saneado</label>
                       <select v-model="selectedProperty.balanceStatus"
                               class="mt-1 w-full px-3 py-2 border rounded-lg text-xs outline-none focus:border-brand-500">
                         <option value="al_dia">Saneado y Al Corriente (Al Día)</option>
@@ -2009,7 +2009,7 @@
                     </div>
 
                     <div>
-                      <label class="block text-[11px] font-bold text-slate-450 uppercase">Saldo Acumulado Pendiente (€)</label>
+                      <label class="block text-[11px] font-bold text-slate-400 uppercase">Saldo Acumulado Pendiente (€)</label>
                       <input type="number" v-model="selectedProperty.pendingAmount"
                              class="mt-1 w-full px-3 py-2 border rounded-lg font-mono text-xs outline-none focus:border-brand-500" />
                     </div>
@@ -2098,7 +2098,7 @@
                 <div>
                   <div class="flex items-center space-x-2 border-b pb-2 mb-3">
                     <span class="text-xs font-bold text-slate-700 uppercase tracking-widest">🔑 Aprobaciones Pendientes</span>
-                    <span class="bg-amber-100 text-amber-850 text-[10px] font-black px-1.5 py-0.5 rounded-full" v-if="globalUsersList">
+                    <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-1.5 py-0.5 rounded-full" v-if="globalUsersList">
                       {{ globalUsersList.filter(u => u.status === 'pending').length }} Pdt.
                     </span>
                   </div>
@@ -2113,7 +2113,7 @@
                          class="p-3 bg-slate-50 border rounded-xl flex items-center justify-between text-xs">
                       <div class="overflow-hidden mr-2">
                         <span class="block font-bold text-slate-800 truncate">{{ u.name }}</span>
-                        <span class="block text-[10px] text-slate-450 font-mono truncate">{{ u.email }}</span>
+                        <span class="block text-[10px] text-slate-400 font-mono truncate">{{ u.email }}</span>
                       </div>
                       <button @click="approveUser(u._id)"
                               class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-bold rounded-lg transition-all flex-shrink-0 cursor-pointer">
@@ -2132,7 +2132,7 @@
               <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
                 <div>
                   <div class="flex items-center space-x-2 border-b pb-2 mb-3">
-                    <span class="text-xs font-bold text-slate-705 uppercase tracking-widest font-sans">💶 Cuota / Giro Masivo Generales</span>
+                    <span class="text-xs font-bold text-slate-700 uppercase tracking-widest font-sans">💶 Cuota / Giro Masivo Generales</span>
                   </div>
                   
                   <div class="space-y-3">
@@ -2251,7 +2251,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <span class="font-bold text-[10px] text-slate-550 truncate max-w-xs">{{ activeInvoiceAudit.concept.substring(0, 30) }}.pdf</span>
+                <span class="font-bold text-[10px] text-slate-500 truncate max-w-xs">{{ activeInvoiceAudit.concept.substring(0, 30) }}.pdf</span>
                 <span class="text-[9px] text-slate-400 uppercase tracking-widest font-mono">Firma Digital Satélite Activa</span>
               </div>
             </div>
@@ -2273,7 +2273,7 @@
       <!-- Chat Bubble Container -->
       <transition name="fade">
         <div v-show="showFloatingChat" 
-             class="mb-4 w-80 md:w-96 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-250 dark:border-slate-800 overflow-hidden flex flex-col"
+             class="mb-4 w-80 md:w-96 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col"
              style="height: 480px;">
           
           <!-- Header -->
@@ -2325,7 +2325,7 @@
           </div>
 
           <!-- Input Block -->
-          <div class="p-3 bg-white dark:bg-slate-900 border-t border-slate-150 dark:border-slate-850 flex items-center gap-2 flex-shrink-0">
+          <div class="p-3 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2 flex-shrink-0">
             <!-- Text Prompt -->
             <input type="text"
                    v-model="floatingChatPrompt"
@@ -2349,7 +2349,7 @@
         <!-- Live ripple effect if recording -->
         <span v-if="isListening" class="absolute -inset-1 rounded-full bg-red-400/25 animate-ping"></span>
         
-        <svg v-if="!showFloatingChat" class="w-6.5 h-6.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+        <svg v-if="!showFloatingChat" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
         <svg v-else class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -2357,6 +2357,8 @@
         </svg>
       </button>
     </div>
+
+    </div> <!-- /AUTHENTICATED WRAPPER -->
 
   </div>
 
