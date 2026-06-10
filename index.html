@@ -206,29 +206,55 @@
               <a href="#funcionamiento" class="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Votación Digital</a>
             </div>
 
-            <!-- Login / Signup Actions -->
-            <div class="flex items-center space-x-3">
-              <button @click="openLoginModal" 
+            <!-- Mobile menu button -->
+            <button @click="showMobileMenu = !showMobileMenu" class="md:hidden p-2 rounded-lg hover:bg-slate-100">
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+
+            <!-- Login / Signup Actions (Desktop) -->
+            <div class="hidden md:flex items-center space-x-3">
+              <button @click="openLoginModal"
                       id="login-btn-nav"
                       class="text-sm font-semibold text-slate-700 hover:text-slate-900 px-3 py-2 rounded-lg hover:bg-slate-100 transition-all cursor-pointer">
                 Iniciar Sesión
               </button>
-              <button @click="openRegisterModal" 
+              <button @click="openRegisterModal"
                       id="register-btn-nav"
                       class="text-sm font-semibold bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-xl transition-all hover:shadow-lg hover:shadow-brand-500/10 active:scale-95 cursor-pointer">
                 Registrarse
               </button>
             </div>
           </div>
+
+          <!-- Mobile Menu -->
+          <div v-if="showMobileMenu" class="md:hidden mt-4 pb-4 border-t border-slate-200 pt-4">
+            <div class="flex flex-col space-y-3">
+              <a href="#ventajas" @click="showMobileMenu = false" class="text-sm font-medium text-slate-600 hover:text-slate-900">Ventajas</a>
+              <a href="#pilares" @click="showMobileMenu = false" class="text-sm font-medium text-slate-600 hover:text-slate-900">Cuentas Abiertas</a>
+              <a href="#funcionamiento" @click="showMobileMenu = false" class="text-sm font-medium text-slate-600 hover:text-slate-900">Votación Digital</a>
+              <div class="flex flex-col space-y-2 pt-2 border-t border-slate-200">
+                <button @click="openLoginModal; showMobileMenu = false"
+                        class="text-sm font-semibold text-slate-700 hover:text-slate-900 px-3 py-2 rounded-lg hover:bg-slate-100 transition-all cursor-pointer text-left">
+                  Iniciar Sesión
+                </button>
+                <button @click="openRegisterModal; showMobileMenu = false"
+                        class="text-sm font-semibold bg-brand-600 hover:bg-brand-700 text-white px-3 py-2 rounded-xl transition-all cursor-pointer">
+                  Registrarse
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </nav>
 
       <!-- HERO SECTION -->
-      <section class="relative bg-gradient-to-br from-brand-600 via-brand-700 to-indigo-900 pt-20 pb-24 px-4 sm:px-6 lg:pt-32 lg:pb-36 lg:px-8 overflow-hidden">
+      <section class="relative bg-gradient-to-br from-brand-600 via-brand-700 to-indigo-900 pt-16 pb-20 sm:pt-20 sm:pb-24 px-4 sm:px-6 lg:pt-32 lg:pb-36 lg:px-8 overflow-hidden">
         <!-- Background Image with Overlay -->
         <div class="absolute inset-0 bg-cover bg-center opacity-20" style="background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');"></div>
         <div class="absolute inset-0 bg-gradient-to-br from-brand-900/80 via-brand-800/70 to-indigo-900/80"></div>
-        
+
         <!-- Ambient Decor Glows -->
         <div class="absolute inset-0 pointer-events-none overflow-hidden select-none">
           <div class="absolute -top-40 -right-40 w-96 h-96 bg-emerald-400 rounded-full blur-3xl opacity-20"></div>
@@ -239,29 +265,29 @@
         <div class="relative max-w-7xl mx-auto">
           <div class="text-center">
             <!-- Logo in Hero -->
-            <div class="flex justify-center mb-6">
+            <div class="flex justify-center mb-4 sm:mb-6">
               <div class="bg-white/10 backdrop-blur-md rounded-xl border border-white/20 shadow-2xl flex items-center justify-center">
-                <img src="/assets/logo.png" alt="VecindarioTransparente Logo" class="h-16 w-16 object-contain" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCAyNCAyNCIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIj48cGF0aCBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGQ9Ik0xOSAyMVY1YTIgMiAwIDAwLTItMkg3YTIgMiAwIDAwLTIgMnYxNm00IDBoLTJtLTIgMGgtNW05LTBIM20yIDBoNU05IDdoMW0tMSA0aDFtLTQtaDFtLTEgNGgxbS01IDEwdi01YTEgMSAwIDAxMS0xaDJhMSAxIDAgMDExIDF2NW0tNCAwaDQiLz48L3N2Zz4=';" />
+                <img src="/assets/logo.png" alt="VecindarioTransparente Logo" class="h-12 w-12 sm:h-16 sm:w-16 object-contain" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCAyNCAyNCIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIj48cGF0aCBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGQ9Ik0xOSAyMVY1YTIgMiAwIDAwLTItMkg3YTIgMiAwIDAwLTIgMnYxNm00IDBoLTJtLTIgMGgtNW05LTBIM20yIDBoNU05IDdoMW0tMSA0aDFtLTQtaDFtLTEgNGgxbS01IDEwdi01YTEgMSAwIDAxMS0xaDJhMSAxIDAwMDExIDF2NW0tNCAwaDQiLz48L3N2Zz4=';" />
               </div>
             </div>
 
-            <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-white/10 backdrop-blur-md text-white border border-white/20 mb-6 animate-fade-in">
+            <span class="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-semibold bg-white/10 backdrop-blur-md text-white border border-white/20 mb-4 sm:mb-6 animate-fade-in">
               🏡 Gestión Comunitaria Inteligente & Transparente
             </span>
-            <h1 class="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight text-white max-w-5xl mx-auto leading-none mt-4 drop-shadow-lg">
+            <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-tight text-white max-w-5xl mx-auto leading-none mt-2 sm:mt-4 drop-shadow-lg">
               La transparencia total para tu <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-cyan-300">comunidad de vecinos</span>
             </h1>
-            <p class="mt-8 text-lg sm:text-xl text-white/90 max-w-2xl mx-auto font-light leading-relaxed drop-shadow">
+            <p class="mt-4 sm:mt-8 text-sm sm:text-lg md:text-xl text-white/90 max-w-2xl mx-auto font-light leading-relaxed drop-shadow px-2">
               Consulta presupuestos, vota decisiones cruciales, gestiona las facturas vecinales y reserva zonas comunes sin discusiones. Tu vecindario con cuentas claras e interactividad real.
             </p>
 
-            <div class="mt-10 flex justify-center space-x-4">
+            <div class="mt-6 sm:mt-10 flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4 px-4">
               <button @click="openRegisterModal"
-                      class="px-8 py-4 bg-white hover:bg-slate-100 text-brand-700 font-bold rounded-xl transition-all shadow-2xl hover:shadow-xl hover:scale-105 cursor-pointer">
+                      class="w-full sm:w-auto px-6 py-3 sm:px-8 sm:py-4 bg-white hover:bg-slate-100 text-brand-700 font-bold rounded-xl transition-all shadow-2xl hover:shadow-xl hover:scale-105 cursor-pointer">
                 Comenzar gratis
               </button>
               <button @click="openLoginModal"
-                      class="px-8 py-4 bg-transparent border-2 border-white hover:bg-white/10 text-white font-bold rounded-xl transition-all hover:scale-105 cursor-pointer backdrop-blur-sm">
+                      class="w-full sm:w-auto px-6 py-3 sm:px-8 sm:py-4 bg-transparent border-2 border-white hover:bg-white/10 text-white font-bold rounded-xl transition-all hover:scale-105 cursor-pointer backdrop-blur-sm">
                 Iniciar Sesión
               </button>
             </div>
@@ -279,11 +305,11 @@
             </p>
           </div>
 
-          <div class="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            
+          <div class="mt-8 sm:mt-12 grid grid-cols-1 gap-6 sm:gap-8 sm:grid-cols-2 lg:grid-cols-3">
+
             <!-- Pilar Cuentas Claras -->
-            <div class="bg-white rounded-2xl p-8 border border-slate-200/70 shadow-sm hover:shadow-md transition-shadow">
-              <div class="bg-emerald-100 text-emerald-700 p-3 rounded-2xl w-12 h-12 flex items-center justify-center mb-6">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/70 shadow-sm hover:shadow-md transition-shadow">
+              <div class="bg-emerald-100 text-emerald-700 p-3 rounded-2xl w-12 h-12 flex items-center justify-center mb-4 sm:mb-6">
                 <!-- Balance/Invoice Vector Icon -->
                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -296,8 +322,8 @@
             </div>
 
             <!-- Pilar Votaciones Digitales -->
-            <div class="bg-white rounded-2xl p-8 border border-slate-200/70 shadow-sm hover:shadow-md transition-shadow">
-              <div class="bg-brand-100 text-brand-750 p-3 rounded-2xl w-12 h-12 flex items-center justify-center mb-6">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/70 shadow-sm hover:shadow-md transition-shadow">
+              <div class="bg-brand-100 text-brand-750 p-3 rounded-2xl w-12 h-12 flex items-center justify-center mb-4 sm:mb-6">
                 <!-- Check vote Vector Icon -->
                 <svg class="w-6 h-6 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
@@ -310,8 +336,8 @@
             </div>
 
             <!-- Pilar Reservas Sin Conflictos -->
-            <div class="bg-white rounded-2xl p-8 border border-slate-200/70 shadow-sm hover:shadow-md transition-shadow">
-              <div class="bg-amber-100 text-amber-700 p-3 rounded-2xl w-12 h-12 flex items-center justify-center mb-6">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/70 shadow-sm hover:shadow-md transition-shadow">
+              <div class="bg-amber-100 text-amber-700 p-3 rounded-2xl w-12 h-12 flex items-center justify-center mb-4 sm:mb-6">
                 <!-- Calendar Vector Icon -->
                 <svg class="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -2345,6 +2371,7 @@
         const toasts = ref([]);
         const showLoginModal = ref(false);
         const showRegisterModal = ref(false);
+        const showMobileMenu = ref(false);
         const activeInvoiceAudit = ref(null);
         const showCreateVoteForm = ref(false);
 
@@ -4351,6 +4378,7 @@
           setTab,
           openInvoiceDoc,
           setView,
+          showMobileMenu,
 
           // i18n and Dark mode
           isDarkMode,
