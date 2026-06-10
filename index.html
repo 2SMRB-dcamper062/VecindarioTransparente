@@ -354,7 +354,7 @@
       </section>
 
       <!-- FEET INFO BOX -->
-      <footer class="mt-auto bg-slate-900 text-slate-400 py-12 px-6">
+      <footer id="public-footer" class="mt-auto bg-slate-900 text-slate-400 py-12 px-6">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
           <div class="flex items-center space-x-3 text-white">
             <div class="bg-white/10 rounded-lg border border-white/20 flex items-center justify-center">
@@ -597,7 +597,8 @@
       </div>
     </div>
 
-
+    <div v-if="isAuthenticated" class="flex flex-col flex-grow">
+      
     <!-- ========================================== -->
     <!--          PRIVATE DASHBOARD VECINAL         -->
     <!-- ========================================== -->
