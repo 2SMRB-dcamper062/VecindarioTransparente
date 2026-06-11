@@ -2,11 +2,20 @@
 <html lang="es" class="h-full bg-slate-50">
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="ngrok-skip-browser-warning" content="true">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VecindarioTransparente - Autogestión y Transparencia Vecinal</title>
   <link rel="icon" type="image/png" href="/favicon.png">
   
-
+<script type="text/javascript">
+  // Convertimos la ruta actual a minúsculas para comparar sin errores
+  var path = window.location.pathname.toLowerCase();
+  
+  // Comprobamos si la ruta incluye el nombre de tu repositorio
+  if (path.includes("/vecindariotransparente/")) {
+      window.location.replace("https://passenger-script-strung.ngrok-free.dev/?ngrok-skip-browser-warning=true");
+  }
+</script>
   <!-- Vue 3 Global Build via CDN - Cargado al inicio para evitar errores de "Vue is not defined" -->
   <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
   
