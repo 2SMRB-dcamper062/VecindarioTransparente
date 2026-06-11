@@ -43,6 +43,7 @@ Sigue estos pasos para clonar el repositorio, configurar el entorno local y arra
 ```bash
 git clone https://github.com/tu-usuario/vecindariotransparente.git
 cd vecindariotransparente
+```
 
 2. **Instalar las dependencias:**
 ```bash
