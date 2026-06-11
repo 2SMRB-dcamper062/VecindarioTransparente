@@ -267,7 +267,7 @@
               </button>
               <button @click="openLoginModal"
                       class="w-full sm:w-auto px-6 py-3 sm:px-8 sm:py-4 bg-transparent border-2 border-white hover:bg-white/10 text-white font-bold rounded-xl transition-all hover:scale-105 cursor-pointer backdrop-blur-sm">
-                Iniciar Sesión
+                {{ t('auth.loginSubmit') }}
               </button>
             </div>
           </div>
@@ -365,7 +365,7 @@
         <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-slate-200">
           <div class="bg-white px-6 pt-6 pb-4 sm:p-8">
             <div class="flex justify-between items-center mb-6">
-              <h3 class="text-xl font-bold text-slate-900">Iniciar Sesión</h3>
+              <h3 class="text-xl font-bold text-slate-900">{{ t('auth.loginTitle') }}</h3>
               <button @click="closeLoginModal" class="text-slate-400 hover:text-slate-600 rounded-lg p-1">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -377,16 +377,16 @@
             <form @submit.prevent="handleLogin" id="login-form">
               <div class="space-y-4">
                 <div>
-                  <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Usuario o Correo Electrónico</label>
-                  <input type="text" v-model="loginForm.usernameOrEmail" required placeholder="p.ej. vecino_juan"
+                  <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">{{ t('auth.loginUserLabel') }}</label>
+                  <input type="text" v-model="loginForm.usernameOrEmail" required :placeholder="t('auth.loginUserPlaceholder')"
                          id="login-username-input"
                          class="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none text-slate-800 text-sm transition-all" />
                 </div>
                 <div>
                   <div class="flex justify-between items-center">
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Contraseña</label>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">{{ t('auth.loginPassLabel') }}</label>
                   </div>
-                  <input type="password" v-model="loginForm.password" required placeholder="••••••••"
+                  <input type="password" v-model="loginForm.password" required :placeholder="t('auth.loginPassPlaceholder')"
                          id="login-password-input"
                          class="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none text-slate-800 text-sm transition-all" />
                 </div>
@@ -395,8 +395,8 @@
               <!-- Demo accounts interactive panel -->
               <div class="mt-5 p-4 rounded-2xl bg-gradient-to-br from-slate-50 to-brand-50/40 border border-slate-200 text-xs space-y-3">
                 <div class="flex items-center justify-between">
-                  <span class="font-bold text-slate-700">Acceso rápido de prueba</span>
-                  <span class="text-[10px] uppercase tracking-wider text-brand-600 font-bold">1 clic</span>
+                  <span class="font-bold text-slate-700">{{ t('auth.demoTitle') }}</span>
+                  <span class="text-[10px] uppercase tracking-wider text-brand-600 font-bold">{{ t('auth.demoOneClick') }}</span>
                 </div>
                 <div class="grid grid-cols-1 gap-2">
                   <button type="button" @click="quickLogin('superadmin', 'superadmin123')" 
@@ -405,25 +405,23 @@
                       <span class="block font-bold text-slate-800">SuperAdmin global</span>
                       <span class="text-[10px] text-slate-500 font-mono">superadmin / superadmin123</span>
                     </div>
-                    <span class="text-[10px] bg-brand-100 text-brand-700 px-2 py-1 rounded-md font-semibold">Entrar</span>
+                    <span class="text-[10px] bg-brand-100 text-brand-700 px-2 py-1 rounded-md font-semibold">{{ t('auth.loginSubmit') }}</span>
                   </button>
-
                   <button type="button" @click="quickLogin('presidente', 'admin123')" 
                           class="flex items-center justify-between p-3 bg-white hover:bg-amber-50 border border-slate-200 hover:border-amber-200 rounded-xl transition duration-200 text-left group cursor-pointer w-full">
                     <div>
                       <span class="block font-bold text-slate-800">Presidente / Admin</span>
                       <span class="text-[10px] text-slate-500 font-mono">presidente / admin123</span>
                     </div>
-                    <span class="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded-md font-semibold">Entrar</span>
+                    <span class="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded-md font-semibold">{{ t('auth.loginSubmit') }}</span>
                   </button>
-
                   <button type="button" @click="quickLogin('vecino_juan', 'vecino123')" 
                           class="flex items-center justify-between p-3 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 rounded-xl transition duration-200 text-left group cursor-pointer w-full">
                     <div>
                       <span class="block font-bold text-slate-800">Vecino propietario</span>
                       <span class="text-[10px] text-slate-500 font-mono">vecino_juan / vecino123</span>
                     </div>
-                    <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded-md font-semibold">Entrar</span>
+                    <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded-md font-semibold">{{ t('auth.loginSubmit') }}</span>
                   </button>
                 </div>
               </div>
@@ -431,10 +429,10 @@
               <div class="mt-6 flex flex-col space-y-2">
                 <button type="submit" 
                         class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl transition-all shadow-md shadow-brand-500/10 active:scale-95 cursor-pointer">
-                  Iniciar Sesión
+                  {{ t('auth.loginSubmit') }}
                 </button>
                 <button type="button" @click="toggleAuthModals" class="w-full text-center text-xs text-slate-500 hover:text-brand-600 font-medium py-1">
-                  ¿No tienes cuenta? Regístrate aquí
+                  {{ t('auth.noAccount') }}
                 </button>
               </div>
             </form>
@@ -456,8 +454,8 @@
           <div class="bg-white px-6 pt-6 pb-4 sm:p-8">
             <div class="flex justify-between items-center mb-6">
               <div>
-                <h3 class="text-xl font-bold text-slate-900 leading-tight">Registra tu Vivienda</h3>
-                <p class="text-xs text-slate-400">Únete a tu bloque ingresando el código de la comunidad.</p>
+                <h3 class="text-xl font-bold text-slate-900 leading-tight">{{ t('auth.registerTitle') }}</h3>
+                <p class="text-xs text-slate-400">{{ t('auth.registerSubtitle') }}</p>
               </div>
               <button @click="closeRegisterModal" class="text-slate-400 hover:text-slate-600 rounded-lg p-1">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -472,32 +470,32 @@
               <!-- 2 Column Layout fields -->
               <div class="grid grid-cols-2 gap-4">
                 <div class="col-span-1">
-                  <label class="block text-xs font-semibold text-slate-500 uppercase">Usuario</label>
-                  <input type="text" v-model="registerForm.username" required placeholder="p.ej. marta_8"
+                  <label class="block text-xs font-semibold text-slate-500 uppercase">{{ t('auth.usernameLabel') }}</label>
+                  <input type="text" v-model="registerForm.username" required :placeholder="t('auth.usernamePlaceholder')"
                          id="reg-username-input"
                          class="mt-1 w-full px-4 py-2 rounded-xl border border-slate-200 focus:border-brand-500 outline-none text-slate-800 text-sm transition-all" />
                 </div>
                 <div class="col-span-1">
-                  <label class="block text-xs font-semibold text-slate-500 uppercase">Nombre Completo</label>
-                  <input type="text" v-model="registerForm.name" required placeholder="Marta Martínez"
+                  <label class="block text-xs font-semibold text-slate-500 uppercase">{{ t('auth.nameLabel') }}</label>
+                  <input type="text" v-model="registerForm.name" required :placeholder="t('auth.namePlaceholder')"
                          id="reg-name-input"
                          class="mt-1 w-full px-4 py-2 rounded-xl border border-slate-200 focus:border-brand-500 outline-none text-slate-800 text-sm transition-all" />
                 </div>
               </div>
 
               <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase">Correo Electrónico</label>
-                <input type="email" v-model="registerForm.email" required placeholder="marta@ejemplo.com"
+                <label class="block text-xs font-semibold text-slate-500 uppercase">{{ t('auth.emailLabel') }}</label>
+                <input type="email" v-model="registerForm.email" required :placeholder="t('auth.emailPlaceholder')"
                        id="reg-email-input"
                        class="mt-1 w-full px-4 py-2 rounded-xl border border-slate-200 focus:border-brand-500 outline-none text-slate-800 text-sm transition-all" />
               </div>
 
               <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase">Contraseña</label>
+                <label class="block text-xs font-semibold text-slate-500 uppercase">{{ t('auth.registerPassLabel') }}</label>
                 <div class="relative mt-1">
                   <input :type="showRegPassword ? 'text' : 'password'"
                          v-model="registerForm.password" required
-                         placeholder="Crea una contraseña segura"
+                         :placeholder="t('auth.registerPassPlaceholder')"
                          id="reg-password-input"
                          class="w-full px-4 py-2 pr-10 rounded-xl border border-slate-200 focus:border-brand-500 outline-none text-slate-800 text-sm transition-all"
                          :class="{
@@ -505,7 +503,6 @@
                            'border-amber-400 focus:border-amber-500': passwordStrength(registerForm.password).score === 2 || passwordStrength(registerForm.password).score === 3,
                            'border-rose-300 focus:border-rose-400': registerForm.password.length > 0 && passwordStrength(registerForm.password).score < 2
                          }" />
-                  <!-- Toggle mostrar/ocultar -->
                   <button type="button" @click="showRegPassword = !showRegPassword"
                           class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
                     <svg v-if="!showRegPassword" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -518,9 +515,8 @@
                   </button>
                 </div>
 
-                <!-- Barra de fortaleza + requisitos (solo cuando hay algo escrito) -->
+                <!-- Strength bar + checklist -->
                 <div v-if="registerForm.password.length > 0" class="mt-2.5 space-y-2">
-                  <!-- Barra de progreso -->
                   <div class="flex gap-1">
                     <div v-for="i in 4" :key="i"
                          class="h-1.5 flex-1 rounded-full transition-all duration-300"
@@ -531,16 +527,14 @@
                            : 'bg-slate-200'">
                     </div>
                   </div>
-                  <!-- Etiqueta de nivel -->
                   <p class="text-[10px] font-bold"
                      :class="{
                        'text-rose-500': passwordStrength(registerForm.password).score <= 1,
                        'text-amber-500': passwordStrength(registerForm.password).score === 2 || passwordStrength(registerForm.password).score === 3,
                        'text-emerald-600': passwordStrength(registerForm.password).score === 4
                      }">
-                    {{ ['', 'Muy débil', 'Débil', 'Aceptable', '✓ Contraseña segura'][passwordStrength(registerForm.password).score] }}
+                    {{ ['' , t('auth.passStrengthVeryWeak'), t('auth.passStrengthWeak'), t('auth.passStrengthFair'), t('auth.passStrengthStrong')][passwordStrength(registerForm.password).score] }}
                   </p>
-                  <!-- Checklist de requisitos -->
                   <ul class="space-y-1">
                     <li v-for="req in passwordStrength(registerForm.password).checks" :key="req.label"
                         class="flex items-center gap-1.5 text-[11px] font-medium transition-colors"
@@ -555,45 +549,66 @@
                 </div>
               </div>
 
-              <!-- NUEVO: SELECCIÓN DE ROL VECINAL -->
+              <!-- Confirm password -->
               <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase">Rol en la Comunidad</label>
+                <label class="block text-xs font-semibold text-slate-500 uppercase">{{ t('auth.confirmPassLabel') }}</label>
+                <div class="relative mt-1">
+                  <input :type="showRegPassword ? 'text' : 'password'"
+                         v-model="registerForm.confirmPassword" required
+                         :placeholder="t('auth.confirmPassPlaceholder')"
+                         class="w-full px-4 py-2 pr-10 rounded-xl border border-slate-200 focus:border-brand-500 outline-none text-slate-800 text-sm transition-all"
+                         :class="{
+                           'border-emerald-400': registerForm.confirmPassword.length > 0 && registerForm.confirmPassword === registerForm.password,
+                           'border-rose-300': registerForm.confirmPassword.length > 0 && registerForm.confirmPassword !== registerForm.password
+                         }" />
+                  <span v-if="registerForm.confirmPassword.length > 0"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-sm">
+                    {{ registerForm.confirmPassword === registerForm.password ? '✓' : '✗' }}
+                  </span>
+                </div>
+                <p v-if="registerForm.confirmPassword.length > 0 && registerForm.confirmPassword !== registerForm.password"
+                   class="mt-1 text-[11px] text-rose-500 font-medium">{{ t('auth.passwordMismatch') }}</p>
+              </div>
+
+              <!-- Role -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase">{{ t('auth.roleLabel') }}</label>
                 <select v-model="registerForm.role" required
                         id="reg-role-select"
                         class="mt-1 w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-brand-500 bg-white outline-none text-slate-800 text-sm transition-all shadow-sm">
-                  <option value="owner">🏠 Vecino - Propietario (Owner)</option>
-                  <option value="tenant">🔑 Vecino - Inquilino (Tenant)</option>
-                  <option value="admin">💼 Admin / Presidente de Bloque (Block Admin)</option>
+                  <option value="owner">{{ t('auth.owner') }}</option>
+                  <option value="tenant">{{ t('auth.tenant') }}</option>
+                  <option value="admin">{{ t('auth.blockAdmin') }}</option>
                 </select>
               </div>
 
               <!-- Community Invitation Code -->
               <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
-                <label class="block text-xs font-bold text-brand-700 uppercase tracking-widest">🔑 Código de Invitación de la Comunidad</label>
-                <input type="text" v-model="registerForm.inviteCode" required placeholder="ALAMEDA2026"
+                <label class="block text-xs font-bold text-brand-700 uppercase tracking-widest">{{ t('auth.inviteLabel') }}</label>
+                <input type="text" v-model="registerForm.inviteCode" required :placeholder="t('auth.invitePlaceholder')"
                        id="reg-invite-input"
                        class="mt-1.5 w-full px-4 py-2.5 rounded-xl border border-indigo-200 focus:border-brand-500 bg-white placeholder-indigo-400 font-mono tracking-widest uppercase font-semibold text-sm outline-none text-slate-800 shadow-sm" />
-                <span class="text-[10px] text-brand-500 mt-1 block">Es necesario que el presidente te lo prevea para unir el catastro a tu cuenta. Código demo: ALAMEDA2026</span>
+                <span class="text-[10px] text-brand-500 mt-1 block">{{ t('auth.inviteHint') }}</span>
               </div>
 
               <!-- Vivienda Details -->
               <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <span class="block text-xs font-bold text-slate-700 uppercase mb-3 text-center tracking-wide">🏠 Datos de tu Vivienda</span>
+                <span class="block text-xs font-bold text-slate-700 uppercase mb-3 text-center tracking-wide">{{ t('auth.propertyData') }}</span>
                 <div class="grid grid-cols-3 gap-3">
                   <div>
-                    <label class="block text-[10px] font-semibold text-slate-400 uppercase text-center">Portal / Bloque</label>
+                    <label class="block text-[10px] font-semibold text-slate-400 uppercase text-center">{{ t('auth.blockLabel') }}</label>
                     <input type="text" v-model="registerForm.block" required placeholder="A"
                            id="reg-block-input"
                            class="mt-1 w-full text-center px-2 py-1.5 rounded-lg border border-slate-200 focus:border-brand-500 outline-none bg-white text-slate-800 text-sm" />
                   </div>
                   <div>
-                    <label class="block text-[10px] font-semibold text-slate-400 uppercase text-center">Piso / Planta</label>
+                    <label class="block text-[10px] font-semibold text-slate-400 uppercase text-center">{{ t('auth.floorLabel') }}</label>
                     <input type="text" v-model="registerForm.floor" required placeholder="3º"
                            id="reg-floor-input"
                            class="mt-1 w-full text-center px-2 py-1.5 rounded-lg border border-slate-200 focus:border-brand-500 outline-none bg-white text-slate-800 text-sm" />
                   </div>
                   <div>
-                    <label class="block text-[10px] font-semibold text-slate-400 uppercase text-center">Letra / Puerta</label>
+                    <label class="block text-[10px] font-semibold text-slate-400 uppercase text-center">{{ t('auth.doorLabel') }}</label>
                     <input type="text" v-model="registerForm.door" required placeholder="C"
                            id="reg-door-input"
                            class="mt-1 w-full text-center px-2 py-1.5 rounded-lg border border-slate-200 focus:border-brand-500 outline-none bg-white text-slate-800 text-sm" />
@@ -601,29 +616,27 @@
                 </div>
               </div>
 
-              <!-- Auto-approve toggle for demo testing -->
+              <!-- Auto-approve toggle -->
               <div class="flex items-start space-x-3 p-3.5 bg-indigo-50/50 rounded-2xl border border-indigo-100 mt-4">
                 <input type="checkbox" id="reg-auto-approve" v-model="registerForm.autoApproved" 
                        class="mt-0.5 w-4.5 h-4.5 text-brand-600 border-slate-300 rounded focus:ring-brand-500 cursor-pointer" />
                 <label for="reg-auto-approve" class="text-xs text-indigo-950 cursor-pointer select-none">
-                  <strong class="block font-bold">⚡ Omitir espera (Aprobación Demo Automática)</strong>
-                  <span class="text-slate-500 text-[11px]">La cuenta de vecino se creará como <span class="font-semibold text-emerald-600">Aprobada</span> para que puedas probar el portal completo de inmediato.</span>
+                  <strong class="block font-bold">{{ t('auth.autoApprove') }}</strong>
+                  <span class="text-slate-500 text-[11px]">{{ t('auth.autoApproveHint') }}</span>
                 </label>
               </div>
 
               <div class="mt-6 flex flex-col space-y-2">
                 <button type="submit" 
                         class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl transition-all shadow-md shadow-brand-500/10 active:scale-95 cursor-pointer">
-                  Completar Registro
+                  {{ t('auth.registerSubmit') }}
                 </button>
-                
                 <button type="button" @click="quickRegister('owner')" 
                         class="w-full py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold rounded-xl text-xs transition transform active:scale-95 cursor-pointer flex items-center justify-center space-x-1.5">
-                  <span>⚡ Crear vecino aleatorio con 1-Click</span>
+                  <span>{{ t('auth.quickRegister') }}</span>
                 </button>
-                
                 <button type="button" @click="toggleAuthModals" class="w-full text-center text-xs text-slate-500 hover:text-brand-600 font-medium py-1">
-                  ¿Ya tienes cuenta? Inicia sesión
+                  {{ t('auth.hasAccount') }}
                 </button>
               </div>
             </form>
@@ -676,12 +689,12 @@
             <button @click="setTab('fincas_global')" 
                     class="w-full flex items-center px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer"
                     :class="activeTab === 'fincas_global' ? 'bg-brand-600 text-white shadow-md shadow-brand-500/15' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'">
-              🏢 Edificios Registrados
+              {{ t('superadmin.buildings') }}
             </button>
             <button @click="setTab('usuarios_global')" 
                     class="w-full flex items-center px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer"
                     :class="activeTab === 'usuarios_global' ? 'bg-brand-600 text-white shadow-md shadow-brand-500/15' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'">
-              👥 Directorio de Vecinos
+              {{ t('superadmin.users') }}
             </button>
             <div class="pt-5 border-t border-slate-200 dark:border-slate-800 mt-5">
               <span class="block px-3.5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 font-mono">Mi Cuenta</span>
@@ -695,7 +708,7 @@
           <div class="p-4 border-t border-slate-100 dark:border-slate-800">
             <button @click="handleLogout" 
                     class="w-full flex items-center justify-center py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:text-rose-600 transition-all cursor-pointer">
-              Cerrar Sesión Base
+              {{ t('superadmin.logout') }}
             </button>
           </div>
         </aside>
@@ -719,12 +732,12 @@
             <div v-if="activeTab === 'fincas_global'" class="space-y-6">
               <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                 <div>
-                  <h3 class="text-lg font-bold text-slate-900 leading-tight">Comunidades Activas</h3>
+                  <h3 class="text-lg font-bold text-slate-900 leading-tight">{{ t('superadmin.communitiesTitle') }}</h3>
                   <p class="text-xs text-slate-500 mt-1">Crea nuevas fincas para generar códigos de acceso válidos para que los presidentes se registren.</p>
                 </div>
                 <button @click="showSuperCommunityModal = true" 
                         class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl transition duration-205 cursor-pointer shadow-lg active:scale-95 flex items-center gap-2">
-                  + Registrar Urbanización
+                  + {{ t('superadmin.registerCommunity').replace('+ ', '') }}
                 </button>
               </div>
 
@@ -847,7 +860,7 @@
                 </div>
                 <button @click="generateProfileAvatar"
                         class="px-4 py-2 rounded-full bg-brand-600 text-white text-xs font-bold hover:bg-brand-700 transition">
-                  🎨 Generar avatar aleatorio
+                  {{ t('profile.generateAvatar') }}
                 </button>
               </div>
 
@@ -903,27 +916,58 @@
 
                   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
                     <div>
-                      <label class="block text-[10px] uppercase text-slate-400 tracking-wide">Contraseña actual</label>
-                      <input type="password" v-model="profileForm.currentPassword" placeholder="Contraseña actual"
+                      <label class="block text-[10px] uppercase text-slate-400 tracking-wide">{{ t('profile.currentPasswordLabel') }}</label>
+                      <input type="password" v-model="profileForm.currentPassword" :placeholder="t('profile.currentPasswordPlaceholder')"
                              class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500" />
                     </div>
                     <div>
-                      <label class="block text-[10px] uppercase text-slate-400 tracking-wide">Nueva contraseña</label>
-                      <input type="password" v-model="profileForm.newPassword" placeholder="Nueva contraseña"
-                             class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500" />
+                      <label class="block text-[10px] uppercase text-slate-400 tracking-wide">{{ t('profile.newPasswordLabel') }}</label>
+                      <input type="password" v-model="profileForm.newPassword" :placeholder="t('profile.newPasswordPlaceholder')"
+                             class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500"
+                             :class="{
+                               'border-emerald-400': profileForm.newPassword.length > 0 && passwordStrength(profileForm.newPassword).score === 4,
+                               'border-amber-400': profileForm.newPassword.length > 0 && passwordStrength(profileForm.newPassword).score >= 2 && passwordStrength(profileForm.newPassword).score < 4,
+                               'border-rose-300': profileForm.newPassword.length > 0 && passwordStrength(profileForm.newPassword).score < 2
+                             }" />
+                      <!-- Mini strength bar -->
+                      <div v-if="profileForm.newPassword.length > 0" class="mt-1.5 space-y-1">
+                        <div class="flex gap-1">
+                          <div v-for="i in 4" :key="i" class="h-1 flex-1 rounded-full transition-all duration-300"
+                               :class="i <= passwordStrength(profileForm.newPassword).score
+                                 ? (passwordStrength(profileForm.newPassword).score === 4 ? 'bg-emerald-500' : passwordStrength(profileForm.newPassword).score >= 3 ? 'bg-amber-400' : 'bg-rose-400')
+                                 : 'bg-slate-200'"></div>
+                        </div>
+                        <ul class="space-y-0.5">
+                          <li v-for="req in passwordStrength(profileForm.newPassword).checks" :key="req.label"
+                              class="flex items-center gap-1 text-[10px] font-medium"
+                              :class="req.ok ? 'text-emerald-600' : 'text-slate-400'">
+                            <svg class="w-2.5 h-2.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                              <path v-if="req.ok" stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                              <path v-else stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            {{ req.label }}
+                          </li>
+                        </ul>
+                      </div>
                     </div>
                     <div>
-                      <label class="block text-[10px] uppercase text-slate-400 tracking-wide">Confirmar contraseña</label>
-                      <input type="password" v-model="profileForm.confirmPassword" placeholder="Confirmar nueva contraseña"
-                             class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500" />
+                      <label class="block text-[10px] uppercase text-slate-400 tracking-wide">{{ t('profile.confirmPasswordLabel') }}</label>
+                      <input type="password" v-model="profileForm.confirmPassword" :placeholder="t('profile.confirmPasswordPlaceholder')"
+                             class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500"
+                             :class="{
+                               'border-emerald-400': profileForm.confirmPassword.length > 0 && profileForm.confirmPassword === profileForm.newPassword,
+                               'border-rose-300': profileForm.confirmPassword.length > 0 && profileForm.confirmPassword !== profileForm.newPassword
+                             }" />
+                      <p v-if="profileForm.confirmPassword.length > 0 && profileForm.confirmPassword !== profileForm.newPassword"
+                         class="mt-1 text-[10px] text-rose-500 font-medium">{{ t('auth.passwordMismatch') }}</p>
+                      <p v-if="profileForm.confirmPassword.length > 0 && profileForm.confirmPassword === profileForm.newPassword && profileForm.newPassword.length > 0"
+                         class="mt-1 text-[10px] text-emerald-600 font-medium">✓ {{ t('auth.passwordMatch') }}</p>
                     </div>
-                  </div>
-
-                  <div class="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  </div>                  <div class="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div class="text-xs text-slate-500">Tus datos se guardarán en el servidor del portal.</div>
                     <button @click="updateProfile"
                             class="w-full sm:w-auto px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl text-sm font-semibold transition">
-                      Guardar perfil
+                      {{ t('profile.saveProfile') }}
                     </button>
                   </div>
                 </div>
@@ -936,12 +980,12 @@
                       <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                       <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    Preferencias
+                    {{ t('profile.preferences') }}
                   </h4>
                   <div class="space-y-4">
                     <div class="flex items-center justify-between py-2">
                       <div>
-                        <span class="text-sm font-medium text-slate-700">Modo oscuro</span>
+                        <span class="text-sm font-medium text-slate-700">{{ t('profile.darkMode') }}</span>
                         <p class="text-xs text-slate-400">Alternar tema claro/oscuro</p>
                       </div>
                       <button @click="toggleDarkMode" 
@@ -992,7 +1036,7 @@
             <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-slate-200">
               <div class="p-6">
                 <div class="flex justify-between items-center mb-5">
-                  <h3 class="text-lg font-bold text-slate-900">Registrar Nueva Comunidad</h3>
+                  <h3 class="text-lg font-bold text-slate-900">{{ t('superadmin.newCommunity') }}</h3>
                   <button @click="showSuperCommunityModal = false" class="text-slate-400 hover:text-slate-600">
                     ✕
                   </button>
@@ -1015,7 +1059,7 @@
                     <button type="button" @click="showSuperCommunityModal = false"
                             class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-xs transition">Cancelar</button>
                     <button type="submit"
-                            class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-md transition">Dar de Alta Finca</button>
+                            class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-md transition">{{ t('superadmin.submitCommunity') }}</button>
                   </div>
                 </form>
               </div>
@@ -1034,27 +1078,27 @@
           </div>
 
           <div>
-            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Solicitud Pendiente de Aprobación</h3>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white">{{ t('auth.pendingTitle') }}</h3>
             <p class="text-xs text-slate-500 mt-2">Hola, <span class="font-semibold text-slate-700 dark:text-slate-300">{{ user?.name || 'Vecino/a' }}</span>.</p>
           </div>
 
           <div class="p-5 bg-indigo-50/50 dark:bg-indigo-950/20 rounded-2xl border border-indigo-100 dark:border-indigo-900 text-xs text-slate-600 dark:text-slate-300 leading-relaxed text-left space-y-2">
             <p>📍 Tu registro en la comunidad de <strong>{{ community?.name || 'la urbanización' }}</strong> se ha realizado correctamente.</p>
             <p>🏠 Tu cuenta está unida correspondientemente a la vivienda: <span class="font-bold underline text-indigo-600 dark:text-indigo-400">Planta {{ myProperty?.floor || '—' }}, Puerta {{ myProperty?.door || '—' }} (Bloque {{ myProperty?.block || '—' }})</span>.</p>
-            <p class="text-amber-600 dark:text-amber-400 font-bold mt-2">⚙️ Por favor, espera a que el Administrador / Presidente de tu comunidad apruebe tu acceso para ver el portal completo.</p>
+            <p class="text-amber-600 dark:text-amber-400 font-bold mt-2">⚙️ {{ t('auth.pendingDesc') }}</p>
           </div>
 
           <!-- DEMO PASS AND ACTIONS -->
           <div class="pt-5 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2.5">
             <button @click="handleSelfApprove" class="w-full py-3 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-bold rounded-xl text-xs shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition transform active:scale-95 cursor-pointer">
-              ⚡ Omitir Espera: Aprobar Cuenta al Instante (Modo Demo)
+              {{ t('auth.selfApprove') }}
             </button>
             
             <button @click="loadDashboardData" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs transition cursor-pointer">
-              🔄 Volver a comprobar estado
+              {{ t('auth.checkStatus') }}
             </button>
             <button @click="handleLogout" class="w-full py-2.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-bold rounded-xl text-xs transition cursor-pointer">
-              🚪 Cerrar Sesión
+              {{ t('auth.logoutAction') }}
             </button>
           </div>
         </div>
@@ -1177,7 +1221,7 @@
             <svg class="w-4 h-4 mr-2 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-            Cerrar Sesión
+            {{ t('general.logout') }}
           </button>
         </div>
       </aside>
@@ -1233,7 +1277,7 @@
               <div>
                 <h3 class="text-xl font-bold text-slate-900 leading-none flex items-center gap-2">
                   <span class="w-2 h-4 bg-emerald-500 rounded-full"></span>
-                  Mi Estado de Cuenta Personal
+                  {{ t('received.title') }}
                 </h3>
                 <p class="text-xs text-slate-500 mt-1">Revisa el estado financiero de tus obligaciones vecinales correspondientes.</p>
               </div>
@@ -1324,13 +1368,13 @@
                 <div>
                   <h4 class="text-base font-bold"
                       :class="myProperty?.balanceStatus === 'al_dia' ? 'text-emerald-900' : 'text-rose-900'">
-                    {{ myProperty?.balanceStatus === 'al_dia' ? '¡Felicidades! Estás al corriente de pago' : 'Importe de cuota pendiente de liquidar' }}
+                    {{ myProperty?.balanceStatus === 'al_dia' ? t('received.statusOk') : t('received.statusKo') }}
                   </h4>
                   <p class="text-xs mt-0.5 leading-relaxed"
                      :class="myProperty?.balanceStatus === 'al_dia' ? 'text-emerald-700' : 'text-rose-700'">
                     {{ myProperty?.balanceStatus === 'al_dia' 
-                      ? 'No tienes ningún recibo ni cuota extraordinaria adeudada en el ejercicio actual.' 
-                      : 'Tienes pagos vencidos. Por favor, regulariza tu saldo para mantener el balance saneado de la finca.' }}
+                      ? t('received.statusOkDesc') 
+                      : t('received.statusKoDesc') }}
                   </p>
                 </div>
               </div>
@@ -1389,7 +1433,7 @@
             <!-- Informative utility tip -->
             <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-500 flex items-start space-x-3">
               <span class="text-base">📅</span>
-              <p class="leading-relaxed">Las remesas de las cuotas mensuales ordinarias se giran automáticamente mediante domiciliación bancaria ordinaria entre el día 1 y 5 de cada mes natural. Para reclamaciones, acuda a administración.</p>
+              <p class="leading-relaxed">{{ t('received.tip') }}</p>
             </div>
           </div>
 
@@ -1407,7 +1451,7 @@
               </div>
               <button @click="generateProfileAvatar"
                       class="px-4 py-2 rounded-full bg-brand-600 text-white text-xs font-bold hover:bg-brand-700 transition">
-                🎨 Generar avatar aleatorio
+                {{ t('profile.generateAvatar') }}
               </button>
             </div>
 
@@ -1464,27 +1508,59 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
                   <div>
-                    <label class="block text-[10px] uppercase text-slate-400 tracking-wide">Contraseña actual</label>
-                    <input type="password" v-model="profileForm.currentPassword" placeholder="Contraseña actual"
+                    <label class="block text-[10px] uppercase text-slate-400 tracking-wide">{{ t('profile.currentPasswordLabel') }}</label>
+                    <input type="password" v-model="profileForm.currentPassword" :placeholder="t('profile.currentPasswordPlaceholder')"
                            class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500" />
                   </div>
                   <div>
-                    <label class="block text-[10px] uppercase text-slate-400 tracking-wide">Nueva contraseña</label>
-                    <input type="password" v-model="profileForm.newPassword" placeholder="Nueva contraseña"
-                           class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500" />
+                    <label class="block text-[10px] uppercase text-slate-400 tracking-wide">{{ t('profile.newPasswordLabel') }}</label>
+                    <input type="password" v-model="profileForm.newPassword" :placeholder="t('profile.newPasswordPlaceholder')"
+                           class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500"
+                           :class="{
+                             'border-emerald-400': profileForm.newPassword.length > 0 && passwordStrength(profileForm.newPassword).score === 4,
+                             'border-amber-400': profileForm.newPassword.length > 0 && passwordStrength(profileForm.newPassword).score >= 2 && passwordStrength(profileForm.newPassword).score < 4,
+                             'border-rose-300': profileForm.newPassword.length > 0 && passwordStrength(profileForm.newPassword).score < 2
+                           }" />
+                    <div v-if="profileForm.newPassword.length > 0" class="mt-1.5 space-y-1">
+                      <div class="flex gap-1">
+                        <div v-for="i in 4" :key="i" class="h-1 flex-1 rounded-full transition-all duration-300"
+                             :class="i <= passwordStrength(profileForm.newPassword).score
+                               ? (passwordStrength(profileForm.newPassword).score === 4 ? 'bg-emerald-500' : passwordStrength(profileForm.newPassword).score >= 3 ? 'bg-amber-400' : 'bg-rose-400')
+                               : 'bg-slate-200'"></div>
+                      </div>
+                      <ul class="space-y-0.5">
+                        <li v-for="req in passwordStrength(profileForm.newPassword).checks" :key="req.label"
+                            class="flex items-center gap-1 text-[10px] font-medium"
+                            :class="req.ok ? 'text-emerald-600' : 'text-slate-400'">
+                          <svg class="w-2.5 h-2.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                            <path v-if="req.ok" stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            <path v-else stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                          {{ req.label }}
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                   <div>
-                    <label class="block text-[10px] uppercase text-slate-400 tracking-wide">Confirmar contraseña</label>
-                    <input type="password" v-model="profileForm.confirmPassword" placeholder="Confirmar nueva contraseña"
-                           class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500" />
+                    <label class="block text-[10px] uppercase text-slate-400 tracking-wide">{{ t('profile.confirmPasswordLabel') }}</label>
+                    <input type="password" v-model="profileForm.confirmPassword" :placeholder="t('profile.confirmPasswordPlaceholder')"
+                           class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500"
+                           :class="{
+                             'border-emerald-400': profileForm.confirmPassword.length > 0 && profileForm.confirmPassword === profileForm.newPassword,
+                             'border-rose-300': profileForm.confirmPassword.length > 0 && profileForm.confirmPassword !== profileForm.newPassword
+                           }" />
+                    <p v-if="profileForm.confirmPassword.length > 0 && profileForm.confirmPassword !== profileForm.newPassword"
+                       class="mt-1 text-[10px] text-rose-500 font-medium">{{ t('auth.passwordMismatch') }}</p>
+                    <p v-if="profileForm.confirmPassword.length > 0 && profileForm.confirmPassword === profileForm.newPassword && profileForm.newPassword.length > 0"
+                       class="mt-1 text-[10px] text-emerald-600 font-medium">✓ {{ t('auth.passwordMatch') }}</p>
                   </div>
                 </div>
 
                 <div class="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <div class="text-xs text-slate-500">Tus datos se guardarán en el servidor del portal y se usarán para tu identidad de usuario.</div>
+                  <div class="text-xs text-slate-500">{{ t('profile.saveInfo') }}</div>
                   <button @click="updateProfile"
                           class="w-full sm:w-auto px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl text-sm font-semibold transition">
-                    Guardar perfil
+                    {{ t('profile.saveProfile') }}
                   </button>
                 </div>
               </div>
@@ -1497,13 +1573,13 @@
                   <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                Preferencias
+                {{ t('profile.preferences') }}
               </h4>
               <div class="space-y-4">
                 <!-- Dark Mode Toggle -->
                 <div class="flex items-center justify-between py-2">
                   <div>
-                    <span class="text-sm font-medium text-slate-700">Modo oscuro</span>
+                    <span class="text-sm font-medium text-slate-700">{{ t('profile.darkMode') }}</span>
                     <p class="text-xs text-slate-400">Alternar tema claro/oscuro</p>
                   </div>
                   <button @click="toggleDarkMode" 
@@ -1554,7 +1630,7 @@
               <div>
                 <h3 class="text-xl font-bold text-slate-900 leading-none flex items-center gap-2">
                   <span class="w-2 h-4 bg-brand-500 rounded-full"></span>
-                  Cuentas Comunes y Balance de Caja
+                  {{ t('finances.title') }}
                 </h3>
                 <p class="text-xs text-slate-500 mt-1">Transparencia financiera garantizada al 100%. Revisa ingresos, gastos y auditorías de facturas.</p>
               </div>
@@ -1565,7 +1641,7 @@
               <!-- Total Ingresos -->
               <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
                 <div>
-                  <span class="block text-[10px] uppercase font-bold text-slate-400">Total Ingresos Recaudados</span>
+                  <span class="block text-[10px] uppercase font-bold text-slate-400">{{ t('finances.income') }}</span>
                   <span class="text-2xl font-black text-slate-900 mt-1 block font-mono">
                     {{ financeSummary.totalIngresos.toFixed(2) }} €
                   </span>
@@ -1580,7 +1656,7 @@
               <!-- Total Gastos comunitarios -->
               <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
                 <div>
-                  <span class="block text-[10px] uppercase font-bold text-slate-400">Gastos Generales Ejecutados</span>
+                  <span class="block text-[10px] uppercase font-bold text-slate-400">{{ t('finances.expenses') }}</span>
                   <span class="text-2xl font-black text-slate-900 mt-1 block font-mono">
                     {{ financeSummary.totalGastos.toFixed(2) }} €
                   </span>
@@ -1596,7 +1672,7 @@
               <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"
                    :class="financeSummary.balance >= 0 ? 'bg-gradient-to-br from-white to-emerald-50/25' : 'bg-gradient-to-br from-white to-rose-50/25'">
                 <div>
-                  <span class="block text-[10px] uppercase font-bold text-slate-400">Fondo Común Disponible</span>
+                  <span class="block text-[10px] uppercase font-bold text-slate-400">{{ t('finances.balance') }}</span>
                   <span class="text-2xl font-black mt-1 block font-mono"
                         :class="financeSummary.balance >= 0 ? 'text-brand-600' : 'text-rose-600'">
                     {{ financeSummary.balance.toFixed(2) }} €
@@ -1623,7 +1699,7 @@
                 <div class="flex items-center gap-2">
                   <span class="w-2 h-4 bg-emerald-500 rounded-full"></span>
                   <span class="text-xs font-bold text-slate-700 uppercase tracking-widest">
-                    ➕ Registrar Nuevo Movimiento Financiero
+                    {{ t('finances.newMovement') }}
                   </span>
                 </div>
                 <svg class="w-4 h-4 text-slate-400 transition-transform duration-200"
@@ -1646,7 +1722,7 @@
                   <div class="lg:col-span-1">
                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Concepto / Proveedor</label>
                     <input type="text" v-model="commFinanceForm.concept"
-                           placeholder="p.ej. Reparación Bajantes – Otis SL"
+                           :placeholder="t('finances.conceptSupplierPlaceholder')"
                            class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs outline-none" />
                   </div>
                   <div>
@@ -1668,7 +1744,7 @@
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
-                    Publicar Movimiento Auditable
+                    {{ t('finances.publishMovement') }}
                   </button>
                 </div>
               </div>
@@ -1677,7 +1753,7 @@
             <!-- Tabla de movimientos y auditoría de facturas -->
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
               <div class="px-5 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-                <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Libro de Caja y de Conciliación de Cuentas</span>
+                <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">{{ t('finances.bookTitle') }}</span>
                 <span class="text-xs text-slate-500 font-medium">Actualizado: hace unos instantes</span>
               </div>
 
@@ -1695,14 +1771,14 @@
                   </thead>
                   <tbody class="divide-y divide-slate-100 text-slate-700 text-xs">
                     <tr v-if="financesList.length === 0">
-                      <td colspan="6" class="px-6 py-8 text-center text-slate-400">Sin movimientos reportados en esta comunidad.</td>
+                      <td colspan="6" class="px-6 py-8 text-center text-slate-400">{{ t('finances.noMovements') }}</td>
                     </tr>
                     <tr v-for="item in financesList" :key="item._id" class="hover:bg-slate-50">
                       <td class="px-6 py-4 font-mono text-slate-500">{{ formatDate(item.date) }}</td>
                       <td class="px-6 py-4">
                         <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold"
                               :class="item.type === 'ingreso' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-rose-50 text-rose-700 border border-rose-100'">
-                          {{ item.type === 'ingreso' ? '📥 Ingreso' : '📤 Gasto' }}
+                          {{ item.type === 'ingreso' ? t('finances.incomeTag') : t('finances.expenseTag') }}
                         </span>
                       </td>
                       <td class="px-6 py-4 font-medium text-slate-900">{{ item.concept }}</td>
@@ -1747,7 +1823,7 @@
               <div>
                 <h3 class="text-xl font-bold text-slate-900 leading-none flex items-center gap-2">
                   <span class="w-2 h-4 bg-orange-500 rounded-full"></span>
-                  Votaciones y Plebiscitos Activos
+                  {{ t('votes.title') }}
                 </h3>
                 <p class="text-xs text-slate-500 mt-1">Participa en decisiones democráticas de la finca. Un propietario, un voto bloqueado.</p>
               </div>
@@ -1765,7 +1841,7 @@
 
             <!-- PRESIDENT CREATOR COLLAPSIBLE WIDGET -->
             <div v-show="showCreateVoteForm" class="bg-white p-6 rounded-2xl border border-brand-200/50 shadow-sm space-y-4">
-              <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider pb-2 border-b">⚙️ Crear Nueva Propuesta a Votación General</h4>
+              <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider pb-2 border-b">{{ t('votes.createTitle') }}</h4>
               
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -1788,7 +1864,7 @@
 
               <div class="flex justify-end space-x-3 pt-2">
                 <button @click="showCreateVoteForm = false" type="button" class="px-4 py-2 rounded-xl text-xs text-slate-500 border border-slate-200 hover:bg-slate-50">Cancelar</button>
-                <button @click="submitNewVote" type="button" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 transition shadow">Publicar Votación</button>
+                <button @click="submitNewVote" type="button" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 transition shadow">{{ t('votes.publish') }}</button>
               </div>
             </div>
 
@@ -1818,7 +1894,7 @@
                     <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Escrutinio Directo</span>
                     
                     <div v-if="!vote.castVotes || vote.castVotes.length === 0" class="text-slate-400 text-center py-2 italic text-[11px]">
-                      Aún no hay sufragios registrados para esta votación.
+                      {{ t('votes.noVotes') }}
                     </div>
                     <div v-else class="space-y-2">
                       <!-- Progress indicators for choices -->
@@ -1881,14 +1957,14 @@
                     <svg class="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
-                    <span>Votación concluida. Resolución final vinculante.</span>
+                    <span>{{ t('votes.concluded') }}</span>
                   </div>
                 </div>
 
                 <!-- Admin close button inside card -->
                 <div v-if="(user?.role === 'presidente' || user?.role === 'admin') && vote.status === 'active'" class="mt-4 flex justify-end">
                   <button @click="closeCommunityVote(vote._id)" class="text-[10px] font-bold text-slate-400 hover:text-rose-600 flex items-center bg-transparent border-0 cursor-pointer">
-                    Cerrar con llave
+                    {{ t('votes.closeLock') }}
                   </button>
                 </div>
               </div>
@@ -1903,7 +1979,7 @@
               <div>
                 <h3 class="text-xl font-bold text-slate-900 leading-none flex items-center gap-2">
                   <span class="w-2 h-4 bg-purple-500 rounded-full"></span>
-                  Reservas Sin Conflictos de Espacios Comunes
+                  {{ t('bookings.title') }}
                 </h3>
                 <p class="text-xs text-slate-500 mt-1">Revisa horarios, organiza actividades lúdicas e higiénicas de forma transparente para todos.</p>
               </div>
@@ -1914,7 +1990,7 @@
               
               <!-- Formulario de reserva (Col 5) -->
               <div class="lg:col-span-5 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
-                <span class="block text-xs font-bold text-slate-700 uppercase tracking-wide border-b pb-2">📅 Agendar Nuevo Espacio Comunal</span>
+                <span class="block text-xs font-bold text-slate-700 uppercase tracking-wide border-b pb-2">{{ t('bookings.newBooking') }}</span>
                 
                 <form @submit.prevent="submitBooking" class="space-y-3.5">
                   <div>
@@ -1970,7 +2046,7 @@
                   <div class="pt-2">
                     <button type="submit" 
                             class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl text-xs transition active:scale-95 shadow cursor-pointer">
-                      Confirmar Reserva
+                      {{ t('bookings.confirm') }}
                     </button>
                   </div>
                 </form>
@@ -1986,7 +2062,7 @@
 
                   <div class="space-y-3 max-h-96 overflow-y-auto scrollbar-thin">
                     <div v-if="bookingsList.length === 0" class="text-slate-400 text-center py-12 italic text-xs">
-                      No hay reservas agendadas próximamente. Sé el primero.
+                      {{ t('bookings.noBookings') }}
                     </div>
                     
                     <div v-for="book in bookingsList" :key="book._id" 
@@ -1996,11 +2072,11 @@
                       <div class="flex items-center space-x-3.5">
                         <div class="p-2.5 rounded-lg text-xs"
                              :class="[
-                               book.facilityName === 'Pista de Pádel' ? 'bg-amber-100 text-amber-800' : '',
+                               book.facilityName === t('bookings.padel') ? 'bg-amber-100 text-amber-800' : '',
                                book.facilityName === 'Piscina' ? 'bg-sky-100 text-sky-800' : '',
-                               book.facilityName === 'Salón Social' ? 'bg-purple-100 text-purple-800' : '',
+                               book.facilityName === t('bookings.socialHall') ? 'bg-purple-100 text-purple-800' : '',
                              ]">
-                          {{ book.facilityName === 'Pista de Pádel' ? '🎾' : book.facilityName === 'Piscina' ? '🏊' : '🏢' }}
+                          {{ book.facilityName === t('bookings.padel') ? '🎾' : book.facilityName === 'Piscina' ? '🏊' : '🏢' }}
                         </div>
                         <div>
                           <span class="block text-xs font-bold text-slate-900">{{ book.facilityName }}</span>
@@ -2029,7 +2105,7 @@
 
                 <!-- Info rule conflict checks -->
                 <div class="mt-4 pt-3.5 border-t text-[10px] text-slate-400 tracking-wide font-medium leading-relaxed">
-                  📌 Sistema autoritativo de horario vecinal. No es posible encabalgar reservas sobre el mismo espacio el mismo día. La cancelación está disponible hasta el inicio de la misma.
+                  {{ t('bookings.tip') }}
                 </div>
               </div>
 
@@ -2044,7 +2120,7 @@
               <div>
                 <h3 class="text-xl font-bold text-slate-900 leading-none flex items-center gap-2">
                   <span class="w-2 h-4 bg-red-500 rounded-full"></span>
-                  Gabinete de Incidencias de la Comunidad
+                  {{ t('issues.title') }}
                 </h3>
                 <p class="text-xs text-slate-500 mt-1">Sube y gestiona problemas de mantenimiento del edificio, rotura de áreas comunes y reparaciones necesarias con evidencia fotográfica.</p>
               </div>
@@ -2054,7 +2130,7 @@
               
               <!-- Reportar Incidencia Form (Col 4) -->
               <div class="lg:col-span-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm h-fit">
-                <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 pb-2 border-b">Reportar Nueva Incidencia</h4>
+                <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 pb-2 border-b">{{ t('issues.reportTitle') }}</h4>
                 
                 <form @submit.prevent="submitIssue" class="space-y-4">
                   <div>
@@ -2104,7 +2180,7 @@
 
                   <button type="submit" 
                           class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs transition active:scale-95 shadow shadow-red-500/10 cursor-pointer">
-                    Publicar Reporte Vecinal
+                    {{ t('issues.submit') }}
                   </button>
                 </form>
               </div>
@@ -2113,7 +2189,7 @@
               <div class="lg:col-span-8 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
                 <div>
                   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b pb-3 mb-4">
-                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wide">📋 Registro General de Reparaciones</span>
+                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wide">{{ t('issues.listTitle') }}</span>
                     
                     <!-- Filters pills -->
                     <div class="flex flex-wrap gap-1.5">
@@ -2143,7 +2219,7 @@
                   <!-- Staggered Issues list -->
                   <div class="space-y-4 max-h-[500px] overflow-y-auto scrollbar-thin pr-2">
                     <div v-if="filteredIssues.length === 0" class="text-slate-400 text-center py-16 italic text-xs">
-                      No se han reportado incidencias en este estado de filtro. La finca está 100% libre de averías visibles.
+                      {{ t('issues.noIssues') }}
                     </div>
 
                     <div v-for="iss in filteredIssues" :key="iss._id" 
@@ -2195,7 +2271,7 @@
                         <button v-if="iss.status !== 'en_proceso'"
                                 @click="changeIssueStatus(iss._id, 'en_proceso')"
                                 class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-lg text-[9px] transition cursor-pointer">
-                          🛠️ Iniciar Reparación
+                          {{ t('issues.startRepair') }}
                         </button>
                         
                         <button v-if="iss.status !== 'resuelto'"
@@ -2216,7 +2292,7 @@
                 </div>
 
                 <div class="mt-4 pt-3.5 border-t text-[10px] text-slate-400 tracking-wide font-medium leading-relaxed">
-                  📌 Carga de fotos comprimidas nativamente en el navegador. La visualización de incidencias se replica inmediatamente entre todos los vecinos registrados.
+                  {{ t('issues.tip') }}
                 </div>
               </div>
 
@@ -2231,7 +2307,7 @@
               <div>
                 <h3 class="text-xl font-bold text-slate-900 leading-none flex items-center gap-2">
                   <span class="w-2 h-4 bg-amber-500 rounded-full"></span>
-                  Gestión y Catastro Comunitario
+                  {{ t('admin.title') }}
                 </h3>
                 <p class="text-xs text-slate-500 mt-1">Gestión administrativa de viviendas, recibos, cuotas comunitarias extraordinarias y gastos de auditoría.</p>
               </div>
@@ -2242,7 +2318,7 @@
               
               <!-- Selector viviendas izquierda (7 cols) -->
               <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <span class="block px-5 py-4 bg-slate-50 border-b text-xs font-bold text-slate-700 uppercase">Catastro General de Viviendas</span>
+                <span class="block px-5 py-4 bg-slate-50 border-b text-xs font-bold text-slate-700 uppercase">{{ t('admin.propertyList') }}</span>
                 
                 <div class="divide-y divide-slate-100 max-h-[500px] overflow-y-auto scrollbar-thin">
                   <div v-for="p in propertiesList" :key="p._id" 
@@ -2277,7 +2353,7 @@
                 <span class="block text-xs font-bold text-slate-700 uppercase tracking-widest border-b pb-2 text-center">⚙️ Editor y Emisión de Recibos</span>
                 
                 <div v-if="!selectedProperty" class="text-slate-400 py-12 text-center text-xs italic">
-                  Selecciona una vivienda del bloque izquierdo para registrar derramas, actualizar cuotas o auditar balances pendientes.
+                  {{ t('admin.noSelection') }}
                 </div>
                 <div v-else class="space-y-4">
                   <div class="p-3 bg-brand-50 border border-brand-100/50 rounded-xl flex items-center justify-between">
@@ -2338,7 +2414,7 @@
                     <div class="pt-2">
                       <button @click="savePropertySettings"
                               class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">
-                        Aplicar Cambios en Vivienda
+                        {{ t('admin.apply') }}
                       </button>
                     </div>
                   </div>
@@ -2392,7 +2468,7 @@
               <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
                 <div>
                   <div class="flex items-center space-x-2 border-b pb-2 mb-3">
-                    <span class="text-xs font-bold text-slate-700 uppercase tracking-widest">🔑 Aprobaciones Pendientes</span>
+                    <span class="text-xs font-bold text-slate-700 uppercase tracking-widest">{{ t('admin.pendingApprovals') }}</span>
                     <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-1.5 py-0.5 rounded-full" v-if="globalUsersList">
                       {{ globalUsersList.filter(u => u.status === 'pending').length }} Pdt.
                     </span>
@@ -2401,7 +2477,7 @@
                   <div class="space-y-3.5 max-h-56 overflow-y-auto scrollbar-thin pr-1">
                     <div v-if="!globalUsersList || globalUsersList.filter(u => u.status === 'pending').length === 0"
                          class="text-[11px] text-slate-400 italic text-center py-8">
-                      No hay vecinos nuevos pendientes de admitir en esta finca.
+                      {{ t('admin.noPending') }}
                     </div>
 
                     <div v-else v-for="u in globalUsersList.filter(u => u.status === 'pending')" :key="u._id"
@@ -2412,14 +2488,14 @@
                       </div>
                       <button @click="approveUser(u._id)"
                               class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-bold rounded-lg transition-all flex-shrink-0 cursor-pointer">
-                        Admitir
+                        {{ t('admin.admit') }}
                       </button>
                     </div>
                   </div>
                 </div>
 
                 <div class="pt-3 border-t text-[9px] text-slate-400 leading-normal font-medium">
-                  Los vecinos deben tener la propiedad aprobada para poder consultar deudas y votar propuestas formales.
+                  {{ t('admin.approvalTip') }}
                 </div>
               </div>
 
@@ -2427,7 +2503,7 @@
               <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
                 <div>
                   <div class="flex items-center space-x-2 border-b pb-2 mb-3">
-                    <span class="text-xs font-bold text-slate-700 uppercase tracking-widest font-sans">💶 Cuota / Giro Masivo Generales</span>
+                    <span class="text-xs font-bold text-slate-700 uppercase tracking-widest font-sans">{{ t('admin.massReceipt') }}</span>
                   </div>
                   
                   <div class="space-y-3">
@@ -2445,13 +2521,13 @@
 
                     <button @click="emitMassReceipt" 
                             class="w-full py-2 bg-amber-500 hover:bg-amber-600 active:scale-95 text-xs text-white uppercase font-bold rounded-lg transition duration-200 cursor-pointer">
-                      Girar Recibo a Toda la Finca
+                      {{ t('admin.massSend') }}
                     </button>
                   </div>
                 </div>
 
                 <div class="pt-3 border-t text-[9px] text-slate-400 leading-normal font-medium">
-                  Esto creará un recibo bajo el status 'pendiente' para todas las viviendas registradas en el catastro vecinal.
+                  {{ t('admin.massTip') }}
                 </div>
               </div>
 
@@ -2459,7 +2535,7 @@
               <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
                 <div>
                   <div class="flex items-center space-x-2 border-b pb-2 mb-3">
-                    <span class="text-xs font-bold text-slate-700 uppercase tracking-widest">📢 Difusión Alertas Push</span>
+                    <span class="text-xs font-bold text-slate-700 uppercase tracking-widest">{{ t('admin.pushTitle') }}</span>
                   </div>
                   
                   <div class="space-y-3">
@@ -2477,13 +2553,13 @@
 
                     <button @click="broadcastPushAlert" 
                             class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-xs text-white uppercase font-bold rounded-lg transition cursor-pointer">
-                      Lanzar Push Alert Activa
+                      {{ t('admin.pushSend') }}
                     </button>
                   </div>
                 </div>
 
                 <div class="pt-3 border-t text-[9px] text-slate-400 leading-normal font-medium">
-                  La Web Push API transmite de forma asíncrona a todos los navegadores móviles y desktop de los vecinos registrados.
+                  {{ t('admin.pushTip') }}
                 </div>
               </div>
 
@@ -2510,7 +2586,7 @@
         <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full border border-slate-200">
           <div class="p-6">
             <div class="flex justify-between items-center pb-4 border-b">
-              <h4 class="text-sm font-bold text-slate-900 uppercase">Auditoría de Factura Vecinal</h4>
+              <h4 class="text-sm font-bold text-slate-900 uppercase">{{ t('invoice.title') }}</h4>
               <button @click="activeInvoiceAudit = null" class="text-slate-400 hover:text-slate-600">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -2553,7 +2629,7 @@
 
             <div class="pt-4 border-t flex justify-end">
               <button @click="activeInvoiceAudit = null" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition active:scale-95 cursor-pointer">
-                Confirmar Cierre de Auditoría
+                {{ t('invoice.close') }}
               </button>
             </div>
           </div>
@@ -2594,7 +2670,7 @@
             <div class="flex flex-col space-y-1 items-start max-w-[85%] self-start">
               <span class="text-[9px] text-slate-400 font-bold ml-1 font-mono">IA VECINDARIO</span>
               <div class="bg-indigo-50 text-indigo-950 dark:bg-indigo-950/40 dark:text-indigo-200 px-3.5 py-2.5 rounded-2xl rounded-tl-none border border-indigo-100/40 dark:border-indigo-900/40 shadow-sm leading-relaxed">
-                ¡Hola! Soy tu asistente de VecindarioTransparente. Puedes consultarme sobre presupuestos, actas, deudas, estatutos o reportar una incidencia.
+                {{ t('chat.welcome') }}
               </div>
             </div>
 
@@ -2603,7 +2679,7 @@
                  class="flex flex-col space-y-1 max-w-[85%]"
                  :class="msg.sender === 'user' ? 'self-end items-end' : 'self-start items-start'">
               <span class="text-[9px] text-slate-400 font-bold px-1 font-mono uppercase">
-                {{ msg.sender === 'user' ? 'Tú' : 'IA' }}
+                {{ msg.sender === 'user' ? t('chat.you') : t('chat.ai') }}
               </span>
               <div class="px-3.5 py-2.5 rounded-2xl shadow-sm leading-relaxed font-sans"
                    :class="msg.sender === 'user' 
@@ -2615,7 +2691,7 @@
 
             <!-- Assistant currently thinking status -->
             <div v-if="floatingBotThinking" class="self-start text-[10px] text-slate-400 italic animate-pulse">
-              Gemini está procesando tu respuesta...
+              {{ t('chat.thinking') }}
             </div>
           </div>
 
@@ -2710,10 +2786,10 @@
         const showRegPassword = ref(false);
         const passwordStrength = (pwd) => {
           const checks = [
-            { label: 'Mínimo 8 caracteres',               ok: pwd.length >= 8 },
-            { label: 'Una letra mayúscula (A-Z)',          ok: /[A-Z]/.test(pwd) },
-            { label: 'Un número (0-9)',                    ok: /[0-9]/.test(pwd) },
-            { label: 'Un carácter especial (!@#$%^&*...)', ok: /[^A-Za-z0-9]/.test(pwd) },
+            { label: t('auth.passReqLength'),   ok: pwd.length >= 8 },
+            { label: t('auth.passReqUpper'),    ok: /[A-Z]/.test(pwd) },
+            { label: t('auth.passReqNumber'),   ok: /[0-9]/.test(pwd) },
+            { label: t('auth.passReqSpecial'),  ok: /[^A-Za-z0-9]/.test(pwd) },
           ];
           return { checks, score: checks.filter(c => c.ok).length };
         };
@@ -2767,6 +2843,7 @@
           name: '',
           email: '',
           password: '',
+          confirmPassword: '',
           role: 'owner',
           inviteCode: 'ALAMEDA2026',
           block: '',
@@ -2947,6 +3024,9 @@
               const missing = strength.checks.filter(c => !c.ok).map(c => c.label).join(', ');
               throw new Error(`Contraseña insegura. Faltan: ${missing}.`);
             }
+            if (registerForm.password !== registerForm.confirmPassword) {
+              throw new Error('Las contraseñas no coinciden.');
+            }
 
             const data = await apiFetch('/api/auth/register', {
               method: 'POST',
@@ -2966,6 +3046,7 @@
             registerForm.name = '';
             registerForm.email = '';
             registerForm.password = '';
+            registerForm.confirmPassword = '';
             registerForm.block = '';
             registerForm.floor = '';
             registerForm.door = '';
@@ -3042,8 +3123,15 @@
             if (profileForm.newPassword && !profileForm.currentPassword) {
               throw new Error('Debes ingresar tu contraseña actual para cambiar la contraseña.');
             }
+            if (profileForm.newPassword) {
+              const strength = passwordStrength(profileForm.newPassword);
+              if (strength.score < 4) {
+                const missing = strength.checks.filter(c => !c.ok).map(c => c.label).join(', ');
+                throw new Error(`Contraseña insegura. Faltan: ${missing}.`);
+              }
+            }
             if (profileForm.newPassword && profileForm.newPassword !== profileForm.confirmPassword) {
-              throw new Error('La nueva contraseña no coincide.');
+              throw new Error('Las contraseñas no coinciden.');
             }
 
             const payload = {
@@ -3545,7 +3633,18 @@
               incomeTag: "📥 Ingreso",
               expenseTag: "📤 Gasto",
               seeAudit: "Ver Auditoría",
-              updated: "Actualizado: hace unos instantes"
+              updated: "Actualizado: hace unos instantes",
+              actionCol: "Acción",
+              newMovement: "➕ Registrar Nuevo Movimiento Financiero",
+              flowTypeLabel: "Tipo de Flujo",
+              flowExpense: "📤 Gasto / Factura",
+              flowIncome: "📥 Ingreso / Recaudación",
+              conceptSupplier: "Concepto / Proveedor",
+              conceptSupplierPlaceholder: "p.ej. Reparación Bajantes – Otis SL",
+              amountEur: "Importe (€)",
+              billingDate: "Fecha Facturación",
+              publishMovement: "Publicar Movimiento Auditable",
+              deleteMovement: "Eliminar movimiento"
             },
             votes: {
               title: "Votaciones y Plebiscitos Activos",
@@ -3685,7 +3784,19 @@
               emailLabel: "Correo Electrónico",
               emailPlaceholder: "marta@ejemplo.com",
               registerPassLabel: "Contraseña",
-              registerPassPlaceholder: "Mínimo 6 caracteres",
+              registerPassPlaceholder: "Crea una contraseña segura",
+              confirmPassLabel: "Confirmar Contraseña",
+              confirmPassPlaceholder: "Repite la contraseña",
+              passwordMismatch: "Las contraseñas no coinciden.",
+              passwordMatch: "Las contraseñas coinciden.",
+              passStrengthVeryWeak: "Muy débil",
+              passStrengthWeak: "Débil",
+              passStrengthFair: "Aceptable",
+              passStrengthStrong: "✓ Contraseña segura",
+              passReqLength: "Mínimo 8 caracteres",
+              passReqUpper: "Una letra mayúscula (A-Z)",
+              passReqNumber: "Un número (0-9)",
+              passReqSpecial: "Un carácter especial (!@#$%^&*...)",
               roleLabel: "Rol en la Comunidad",
               owner: "🏠 Vecino - Propietario (Owner)",
               tenant: "🔑 Vecino - Inquilino (Tenant)",
@@ -3762,7 +3873,9 @@
               welcome: "¡Hola! Soy tu asistente de VecindarioTransparente. Puedes consultarme sobre presupuestos, actas, deudas, estatutos o reportar una incidencia. Pulsa el botón del micrófono para activar la voz interactiva en vivo, o escríbeme aquí abajo.",
               placeholder: "Escribe un mensaje...",
               send: "Enviar",
-              thinking: "Gemini está procesando tu respuesta..."
+              thinking: "Gemini está procesando tu respuesta...",
+              you: "Tú",
+              ai: "IA"
             }
           },
           en: {
@@ -3863,7 +3976,18 @@
               incomeTag: "📥 Income",
               expenseTag: "📤 Expense",
               seeAudit: "View Audit",
-              updated: "Updated: moments ago"
+              updated: "Updated: moments ago",
+              actionCol: "Action",
+              newMovement: "➕ Register New Financial Entry",
+              flowTypeLabel: "Flow Type",
+              flowExpense: "📤 Expense / Invoice",
+              flowIncome: "📥 Income / Collection",
+              conceptSupplier: "Concept / Supplier",
+              conceptSupplierPlaceholder: "e.g. Downpipe Repair – Otis SL",
+              amountEur: "Amount (€)",
+              billingDate: "Invoice Date",
+              publishMovement: "Publish Auditable Entry",
+              deleteMovement: "Delete entry"
             },
             votes: {
               title: "Voting & Active Plebiscites",
@@ -4003,7 +4127,19 @@
               emailLabel: "Email",
               emailPlaceholder: "marta@example.com",
               registerPassLabel: "Password",
-              registerPassPlaceholder: "Minimum 6 characters",
+              registerPassPlaceholder: "Create a secure password",
+              confirmPassLabel: "Confirm Password",
+              confirmPassPlaceholder: "Repeat your password",
+              passwordMismatch: "Passwords do not match.",
+              passwordMatch: "Passwords match.",
+              passStrengthVeryWeak: "Very weak",
+              passStrengthWeak: "Weak",
+              passStrengthFair: "Fair",
+              passStrengthStrong: "✓ Strong password",
+              passReqLength: "Minimum 8 characters",
+              passReqUpper: "One uppercase letter (A-Z)",
+              passReqNumber: "One number (0-9)",
+              passReqSpecial: "One special character (!@#$%^&*...)",
               roleLabel: "Community Role",
               owner: "🏠 Owner",
               tenant: "🔑 Tenant",
@@ -4080,7 +4216,9 @@
               welcome: "Hi! I'm your VecindarioTransparente assistant. Ask me about budgets, minutes, debts, statutes or report an issue. Press the mic button to activate live interactive voice, or type below.",
               placeholder: "Type a message...",
               send: "Send",
-              thinking: "Gemini is processing your response..."
+              thinking: "Gemini is processing your response...",
+              you: "You",
+              ai: "AI"
             }
           }
         };
