@@ -58,6 +58,20 @@ GEMINI_API_KEY=tu_clave_aqui
 
 El servidor la lee al arrancar (`server.ts` carga `.env.local` automáticamente).
 
+## Configuración de Correo Electrónico (SMTP)
+
+Para que el sistema envíe notificaciones por email (registros, avisos de recibos, etc.), añade lo siguiente a tu archivo `.env.local`:
+
+```env
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=vecindariotransparente@gmail.com
+EMAIL_PASS=m w l y g r j y j f k r m t h f
+EMAIL_FROM=VecindarioTransparente <vecindariotransparente@gmail.com>
+```
+
+*Si usas Gmail, recuerda generar una **Contraseña de Aplicación** en tu cuenta de Google (Seguridad > Verificación en dos pasos > Contraseñas de aplicaciones).*
+
 ## Recargar datos demo
 
 - Desde terminal: `npm run db:seed`

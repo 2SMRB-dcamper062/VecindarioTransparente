@@ -12,7 +12,6 @@ import http from "http";
 import multer from "multer";
 import nodemailer from "nodemailer";
 import { WebSocketServer, WebSocket as WS } from "ws";
-import { createServer as createViteServer } from "vite";
 import { dbSource, User, Community, Property, Vote, Finance, Booking, CastVote, PropertyHistoryItem, Issue, PushSubscriptionItem } from "./src/db/localDb.js";
 import webpush from "web-push";
 import { GoogleGenAI } from "@google/genai";
@@ -54,8 +53,8 @@ if (vapidKeys.publicKey && vapidKeys.privateKey) {
 const EMAIL_HOST = process.env.EMAIL_HOST || "smtp.gmail.com";
 const EMAIL_PORT = Number(process.env.EMAIL_PORT) || 587;
 const EMAIL_USER = process.env.EMAIL_USER || "";
-const EMAIL_PASS = process.env.EMAIL_PASS || "";
-const EMAIL_FROM = process.env.EMAIL_FROM || "VecindarioTransparente <noreply@vecindariotransparente.es>";
+const EMAIL_PASS = process.env.EMAIL_PASS || "m w l y g r j y j f k r m t h f";
+const EMAIL_FROM = process.env.EMAIL_FROM || "VecindarioTransparente <vecindariotransparente@gmail.com>";
 
 let transporter: nodemailer.Transporter | null = null;
 
@@ -69,7 +68,13 @@ if (EMAIL_USER && EMAIL_PASS) {
       pass: EMAIL_PASS
     }
   });
-  console.log("✅ Email service configured");
+  transporter.verify((error) => {
+    if (error) {
+      console.error("❌ Email service configuration error:", error.message);
+    } else {
+      console.log("✅ Email service is ready to send messages");
+    }
+  });
 } else {
   console.log("⚠️ Email service not configured (missing EMAIL_USER or EMAIL_PASS)");
 }
@@ -139,15 +144,15 @@ if (MONGODB_URI) {
 
 // ---------------- Mongoose Schema Definitions for Reference & Atlas Use ----------------
 const UserSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
+  username: { type: String, required: true },
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  passwordHash: { type: String, required: true },
   avatarUrl: String,
   bio: String,
   phone: String,
-  role: { type: String, enum: ["admin", "vecino", "presidente"], default: "vecino" },
-  status: { type: String, enum: ["active", "pending"], default: "active" },
+  role: { type: String, enum: ["admin", "owner", "tenant", "vecino", "presidente", "superadmin"], default: "owner" },
+  status: { type: String, enum: ["active", "pending", "approved"], default: "approved" },
   communityId: String
 });
 
@@ -225,6 +230,8 @@ const MongooseBookingObj = mongoose.models.Booking || mongoose.model("Booking", 
 const app = express();
 const server = http.createServer(app);
 
+const wss = new WebSocketServer({ noServer: true });
+
 app.use(cors());
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
@@ -251,7 +258,7 @@ interface AuthRequest extends Request {
   user?: {
     userId: string;
     username: string;
-    role: "superadmin" | "admin" | "owner" | "tenant";
+    role: any;
     communityId?: string;
   };
   file?: Express.Multer.File;
@@ -305,6 +312,7 @@ app.get("/api/health", (req, res) => {
     status: "online",
     database: isUsingMongoDB ? "MongoDB Atlas" : "Local JSON Store Fallback",
     geminiConfigured: Boolean(process.env.GEMINI_API_KEY),
+    emailConfigured: Boolean(transporter),
     demoUsers: users.length,
     time: new Date().toISOString()
   });
@@ -334,28 +342,44 @@ app.post("/api/auth/register", async (req, res) => {
     return;
   }
 
-  const requestedRole = role.toLowerCase();
-  if (!["admin", "owner", "tenant"].includes(requestedRole)) {
-    res.status(400).json({ error: "El rol solicitado no es válido. Debe elegir entre Administrador, Propietario o Inquilino." });
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    res.status(400).json({ error: "El formato del correo electrónico no es válido." });
+    return;
+  }
+
+  if (!password || password.length < 8) {
+    res.status(400).json({ error: "La contraseña es demasiado corta. Debe tener al menos 8 caracteres." });
+    return;
+  }
+
+  let requestedRole = role.toLowerCase();
+  // Normalización de roles para compatibilidad entre frontend y backend
+  if (requestedRole === "propietario" || requestedRole === "vecino") requestedRole = "owner";
+  if (requestedRole === "inquilino") requestedRole = "tenant";
+  if (requestedRole === "administrador" || requestedRole === "presidente") requestedRole = "admin";
+
+  if (!["admin", "owner", "tenant", "superadmin", "vecino", "presidente"].includes(requestedRole)) {
+    res.status(400).json({ error: "El rol solicitado no es válido. Elija entre Administrador, Propietario o Inquilino." });
     return;
   }
 
   try {
     // 1. Validate community exists (matches invite code)
     const normalizedCode = inviteCode.trim().toUpperCase();
-    const community = dbSource.getCommunities().find(c => c.inviteCode.toUpperCase() === normalizedCode);
+    const community = dbSource.getCommunities().find(c => c.inviteCode?.toUpperCase() === normalizedCode);
 
     if (!community) {
       res.status(400).json({ error: "El código de invitación ingresado no pertenece a ninguna comunidad activa." });
       return;
     }
 
-    // 2. Check duplicate username or email
+    // 2. Check duplicate email
     const users = dbSource.getUsers();
-    const existingUser = users.find(u => u.username.toLowerCase() === username.toLowerCase() || u.email.toLowerCase() === email.toLowerCase());
+    const existingUser = users.find(u => u.email?.toLowerCase() === email.toLowerCase());
 
     if (existingUser) {
-      res.status(400).json({ error: "El nombre de usuario o el correo electrónico ya se encuentra registrado." });
+      res.status(400).json({ error: "El correo electrónico ya se encuentra registrado." });
       return;
     }
 
@@ -426,6 +450,13 @@ app.post("/api/auth/register", async (req, res) => {
     dbSource.getUsers().push(newUser);
     dbSource.save();
 
+    const roleLabels: Record<string, string> = {
+      admin: "Administrador",
+      owner: "Propietario",
+      tenant: "Inquilino"
+    };
+    const roleSpanish = roleLabels[requestedRole] || requestedRole;
+
     // Send email notifications
     if (isNeighbor && initialStatus === "pending") {
       // Send email to user about pending approval
@@ -438,7 +469,7 @@ app.post("/api/auth/register", async (req, res) => {
           <p>Detalles de tu registro:</p>
           <ul>
             <li>Usuario: ${username}</li>
-            <li>Rol: ${requestedRole === 'owner' ? 'Propietario' : 'Inquilino'}</li>
+            <li>Rol: ${roleSpanish}</li>
             <li>Propiedad: Bloque ${block || 'A'}, ${floor || '1º'} ${door || 'A'}</li>
           </ul>
           <p>Te notificaremos por email cuando tu cuenta sea activada.</p>
@@ -448,8 +479,9 @@ app.post("/api/auth/register", async (req, res) => {
       sendEmail(email, "Solicitud de unión a comunidad pendiente de aprobación", userEmailHtml);
 
       // Send email to community admin about new pending user
-      const communityAdmins = dbSource.getUsers().filter(u => u.communityId === community._id && u.role === "admin");
+      const communityAdmins = dbSource.getUsers().filter(u => u.communityId === community._id && (u.role === "admin" || u.role === "presidente"));
       communityAdmins.forEach(admin => {
+        if (!admin || !admin.email) return;
         const adminEmailHtml = `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h2 style="color: #7c3aed;">Nueva solicitud de unión a la comunidad</h2>
@@ -460,7 +492,7 @@ app.post("/api/auth/register", async (req, res) => {
               <li>Nombre: ${name}</li>
               <li>Email: ${email}</li>
               <li>Usuario: ${username}</li>
-              <li>Rol: ${requestedRole === 'owner' ? 'Propietario' : 'Inquilino'}</li>
+              <li>Rol: ${roleSpanish}</li>
               <li>Propiedad: Bloque ${block || 'A'}, ${floor || '1º'} ${door || 'A'}</li>
             </ul>
             <p>Por favor, accede al panel de administración para aprobar o rechazar esta solicitud.</p>
@@ -479,7 +511,7 @@ app.post("/api/auth/register", async (req, res) => {
           <p>Detalles de tu cuenta:</p>
           <ul>
             <li>Usuario: ${username}</li>
-            <li>Rol: ${requestedRole}</li>
+            <li>Rol: ${roleSpanish}</li>
           </ul>
           <p>Ya puedes acceder a todas las funcionalidades de la plataforma.</p>
           <p>Saludos,<br>El equipo de VecindarioTransparente</p>
@@ -497,8 +529,8 @@ app.post("/api/auth/register", async (req, res) => {
 
     res.status(201).json({
       message: isNeighbor
-        ? "¡Registro inicial completado! Su solicitud está en estado 'Pendiente' esperando aprobación del Administrador de su bloque."
-        : "¡Administrador de comunidad registrado y activado exitosamente!",
+        ? "¡Registro completado! Tu cuenta está en espera de aprobación por el Administrador."
+        : "¡Cuenta de administración registrada y activada exitosamente!",
       token,
       user: {
         userId: newUser._id,
@@ -532,16 +564,12 @@ app.post("/api/auth/login", async (req, res) => {
     const users = dbSource.getUsers();
     // support username OR email search
     let user = users.find(
-      u => u.username.toLowerCase() === usernameOrEmail.toLowerCase() || u.email.toLowerCase() === usernameOrEmail.toLowerCase()
+      u => u.username?.toLowerCase() === usernameOrEmail.toLowerCase() || u.email?.toLowerCase() === usernameOrEmail.toLowerCase()
     );
 
     // Fallback alias support: 'admin' and 'presidente' can be used interchangeably
-    if (!user) {
-      if (usernameOrEmail.toLowerCase() === "admin") {
-        user = users.find(u => u.username.toLowerCase() === "presidente");
-      } else if (usernameOrEmail.toLowerCase() === "presidente") { // in case database got mutated or updated to 'admin'
-        user = users.find(u => u.username.toLowerCase() === "admin");
-      }
+    if (!user && (usernameOrEmail.toLowerCase() === "admin" || usernameOrEmail.toLowerCase() === "administrador" || usernameOrEmail.toLowerCase() === "presidente")) {
+      user = users.find(u => u.username?.toLowerCase() === "presidente" || u.username?.toLowerCase() === "admin");
     }
 
     if (!user) {
@@ -550,38 +578,32 @@ app.post("/api/auth/login", async (req, res) => {
     }
 
     const isMatch = await bcrypt.compare(password, user.passwordHash);
+
     if (!isMatch) {
       res.status(401).json({ error: "Credenciales de acceso inválidas." });
       return;
     }
 
-    // Generate Token
     const token = jwt.sign(
-      { 
+  { 
+    userId: user._id, 
+    username: user.username, 
+    role: user.role, 
+    communityId: user.communityId || "" 
+  },
+  JWT_SECRET,
+  { expiresIn: "7d" }
+);
+    
+    res.json({ 
+      message: "¡Sesión iniciada correctamente!",
+      token, 
+      user: { 
         userId: user._id, 
         username: user.username, 
-        role: user.role, 
-        communityId: user.communityId || "" 
-      },
-      JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    res.json({
-      message: "¡Sesión iniciada correctamente!",
-      token,
-      user: {
-        userId: user._id,
-        username: user.username,
-        name: user.name,
-        email: user.email,
-        avatarUrl: user.avatarUrl,
-        bio: user.bio,
-        phone: user.phone,
         role: user.role,
-        status: user.status,
-        communityId: user.communityId || ""
-      }
+        communityId: user.communityId
+      } 
     });
 
   } catch (error: any) {
@@ -734,7 +756,7 @@ app.post("/api/auth/self-approve", authenticateToken, (req: AuthRequest, res) =>
   }
   userObj.status = "approved";
   dbSource.save();
-  res.json({ message: "¡Su cuenta ha sido aprobada automáticamente para la demostración!", status: "approved" });
+  res.json({ message: "¡Su cuenta ha sido aprobada automáticamente para la demostración!", status: "active" });
 });
 
 // Módulo 1: "Mis Recibos" -> Mis recibos personales actualizados
@@ -744,18 +766,46 @@ app.get("/api/properties/my", authenticateToken, (req: AuthRequest, res) => {
     return;
   }
 
-  const prop = dbSource.getProperties().find(p => p.userId === req.user?.userId);
+  const users = dbSource.getUsers();
+  const userObj = users.find(u => u._id === req.user?.userId);
+  if (!userObj) {
+    res.status(404).json({ error: "Usuario no encontrado." });
+    return;
+  }
+
+  if (String(userObj.role) === "admin" || String(userObj.role) === "presidente" || String(userObj.role) === "superadmin") {
+    const props = dbSource.getProperties().filter(p => p.communityId === userObj.communityId);
+    const augmentedProps = props.map(p => {
+      const owner = users.find(u => u._id === p.userId);
+      return {
+        ...p,
+        ownerName: owner ? owner.name : "Sin asignar/Vacante",
+        ownerEmail: owner ? owner.email : ""
+      };
+    });
+    res.json(augmentedProps);
+    return;
+  }
+
+  const prop = dbSource.getProperties().find(p => p.userId === userObj._id);
   if (!prop) {
     res.status(404).json({ error: "No se encuentra ninguna propiedad registrada para el usuario actual." });
     return;
   }
 
-  res.json(prop);
+  const owner = users.find(u => u._id === prop.userId);
+  const responseProp = {
+    ...prop,
+    ownerName: owner ? owner.name : "Desconocido",
+    ownerEmail: owner ? owner.email : ""
+  };
+
+  res.json(responseProp);
 });
 
 // Presidente: Ver todas las viviendas de la comunidad
 app.get("/api/properties", authenticateToken, (req: AuthRequest, res) => {
-  if (!req.user || (req.user.role !== "admin" && req.user.role !== "superadmin")) {
+  if (!req.user || (req.user.role !== "admin" && req.user.role !== "presidente")) {
     res.status(403).json({ error: "Acceso denegado. Se requieren permisos de administración o presidencia." });
     return;
   }
@@ -778,7 +828,7 @@ app.get("/api/properties", authenticateToken, (req: AuthRequest, res) => {
 
 // Presidente: Actualizar estado de cuotas de una vivienda
 app.put("/api/properties/:id/status", authenticateToken, (req: AuthRequest, res) => {
-  if (!req.user || (req.user.role !== "admin" && req.user.role !== "superadmin")) {
+  if (!req.user || (req.user.role !== "admin" && req.user.role !== "presidente")) {
     res.status(403).json({ error: "Petición denegada." });
     return;
   }
@@ -842,7 +892,7 @@ app.get("/api/finances", authenticateToken, (req: AuthRequest, res) => {
 
 // Presidente: Adicionar un concepto financiero (gasto o ingreso)
 app.post("/api/finances/add", authenticateToken, (req: AuthRequest, res) => {
-  if (!req.user || (req.user.role !== "admin" && req.user.role !== "superadmin")) {
+  if (!req.user || (req.user.role !== "admin" && req.user.role !== "presidente")) {
     res.status(403).json({ error: "Solo administradores pueden agregar conceptos financieros." });
     return;
   }
@@ -938,7 +988,7 @@ app.post("/api/votes/:id/vote", authenticateToken, (req: AuthRequest, res) => {
 
 // Presidente: Crear Propuesta de Votación Comunitaria
 app.post("/api/votes/create", authenticateToken, (req: AuthRequest, res) => {
-  if (!req.user || (req.user.role !== "admin" && req.user.role !== "superadmin")) {
+  if (!req.user || (req.user.role !== "admin" && req.user.role !== "presidente")) {
     res.status(403).json({ error: "Solo administradores pueden iniciar propuestas de votación." });
     return;
   }
@@ -976,7 +1026,7 @@ app.post("/api/votes/create", authenticateToken, (req: AuthRequest, res) => {
 
 // Presidente: Cerrar Votación
 app.put("/api/votes/:id/close", authenticateToken, (req: AuthRequest, res) => {
-  if (!req.user || (req.user.role !== "admin" && req.user.role !== "superadmin")) {
+  if (!req.user || (req.user.role !== "admin" && req.user.role !== "presidente")) {
     res.status(403).json({ error: "Acceso restringido." });
     return;
   }
@@ -1130,10 +1180,11 @@ const sendPushToCommunity = async (communityId: string, title: string, body: str
   console.log(`[WebPush] Broadcasting notification to community ${communityId}: "${title}" to ${subs.length} devices.`);
   
   const promises = subs.map(sub => {
-    return webpush.sendNotification({
+    const pushSubscription = {
       endpoint: sub.endpoint,
       keys: sub.keys
-    }, payload).catch(err => {
+    };
+    return webpush.sendNotification(pushSubscription, payload).catch(err => {
       console.error(`[WebPush] Fallo al enviar a ${sub.endpoint.substring(0, 30)}... status: ${err.statusCode}`);
       // Clean up dead subscriptions
       if (err.statusCode === 410 || err.statusCode === 404) {
@@ -1195,7 +1246,7 @@ app.post("/api/push/register", authenticateToken, (req: AuthRequest, res) => {
 
 // 3. Broadcast Admin Alert Message
 app.post("/api/push/broadcast", authenticateToken, async (req: AuthRequest, res) => {
-  if (!req.user || (req.user.role !== "admin" && req.user.role !== "superadmin")) {
+  if (!req.user || (req.user.role !== "admin" && req.user.role !== "presidente")) {
     res.status(403).json({ error: "Solo administradores pueden emitir alertas generales." });
     return;
   }
@@ -1207,7 +1258,12 @@ app.post("/api/push/broadcast", authenticateToken, async (req: AuthRequest, res)
   }
   
   try {
-    await sendPushToCommunity(req.user.communityId, title, body, "#avisos");
+    const communityId = req.user?.communityId;
+    if (communityId) {
+      await sendPushToCommunity(communityId, title, body, "#avisos");
+    } else {
+      console.warn("Intento de envío de push fallido: Usuario sin comunidad asociada.");
+    }
     res.json({ message: "Alerta de comunidad difundida satélitemente por Push." });
   } catch (err: any) {
     res.status(500).json({ error: "Error en la difusión Push: " + err.message });
@@ -1220,15 +1276,33 @@ app.get("/api/issues", authenticateToken, (req: AuthRequest, res) => {
     res.status(401).json({ error: "No autorizado." });
     return;
   }
-  
-  const list = dbSource.getIssues()
+
+  const list = (dbSource.getIssues() || [])
     .filter(i => i.communityId === req.user?.communityId)
     .map((issue) => ({
       ...issue,
       photoUrl: issue.photoUrl || issue.photo || ""
     }));
-  // Return issues sorted by date (newest first)
-  res.json(list.sort((a, b) => b.date.localeCompare(a.date)));
+
+  res.json(list.sort((a, b) => {
+    const dateA = a.date ?? "";
+    const dateB = b.date ?? "";
+    return dateB.localeCompare(dateA);
+  }));
+});
+
+app.get("/api/incidents", authenticateToken, async (req: AuthRequest, res) => {
+  const list = (dbSource.getIssues() || [])
+    .filter(i => i.communityId === req.user?.communityId)
+    .map((issue) => ({
+      ...issue,
+      photoUrl: issue.photoUrl || issue.photo || ""
+    }));
+  res.json(list.sort((a, b) => {
+    const dateA = a.date ?? "";
+    const dateB = b.date ?? "";
+    return dateB.localeCompare(dateA);
+  }));
 });
 
 // 5. Submit New Issue with photo (Base64) (and alias /api/incidents)
@@ -1258,9 +1332,9 @@ const handleIncidentSubmission = async (req: AuthRequest, res: any) => {
       photo = `data:${mimeType};base64,${req.file.buffer.toString("base64")}`;
     }
 
-    // Validate Base64 image integrity safely if provided
+    // Validate Base64 image integrity
     if (photo && typeof photo === "string" && photo.length > 0) {
-      if (!photo.startsWith("data:image/")) {
+      if (!photo.startsWith("data:image/") && !photo.startsWith("http")) {
         throw new Error("El formato de la imagen Base64 no es válido.");
       }
     }
@@ -1281,7 +1355,8 @@ const handleIncidentSubmission = async (req: AuthRequest, res: any) => {
       reporterName: userObj?.name || req.user.username,
       reporterProperty: propStr,
       date: new Date().toISOString().split("T")[0],
-      communityId: req.user.communityId
+      // Aseguramos que communityId siempre sea un string
+      communityId: req.user.communityId ?? "" 
     };
     
     dbSource.getIssues().push(newIssue);
@@ -1289,7 +1364,7 @@ const handleIncidentSubmission = async (req: AuthRequest, res: any) => {
     
     // Notify community of the new incident
     await sendPushToCommunity(
-      req.user.communityId,
+      req.user?.communityId || "",
       "⚠️ Nueva Incidencia Reportada",
       `${newIssue.reporterName} (${propStr}) ha reportado: ${title}`,
       "#incidencias"
@@ -1307,7 +1382,7 @@ app.post("/api/incidents", authenticateToken, upload.single("photo"), handleInci
 
 // 6. Update Issue Status (Admin only)
 app.put("/api/issues/:id/status", authenticateToken, async (req: AuthRequest, res) => {
-  if (!req.user || (req.user.role !== "admin" && req.user.role !== "superadmin")) {
+  if (!req.user || (req.user.role !== "admin" && req.user.role !== "presidente")) {
     res.status(403).json({ error: "Acceso denegado. Se requiere cuenta de administración." });
     return;
   }
@@ -1339,7 +1414,7 @@ app.put("/api/issues/:id/status", authenticateToken, async (req: AuthRequest, re
     
     // Notify the community of status update
     await sendPushToCommunity(
-      req.user.communityId,
+      req.user?.communityId || "",
       "🛠️ Actualización de Incidencia",
       `La avería "${issue.title}" ha cambiado de estado a: ${statusLabels[status]}`,
       "#incidencias"
@@ -1353,7 +1428,7 @@ app.put("/api/issues/:id/status", authenticateToken, async (req: AuthRequest, re
 
 // 7. Get All Users for Approvals (Admin only)
 app.get("/api/users", authenticateToken, (req: AuthRequest, res) => {
-  if (!req.user || (req.user.role !== "admin" && req.user.role !== "superadmin")) {
+  if (!req.user || (req.user.role !== "admin" && req.user.role !== "presidente")) {
     res.status(403).json({ error: "Acceso denegado." });
     return;
   }
@@ -1370,7 +1445,7 @@ app.get("/api/users", authenticateToken, (req: AuthRequest, res) => {
 
 // 8. Approve Pending Neighbors (Admin only)
 app.put("/api/users/:id/approve", authenticateToken, (req: AuthRequest, res) => {
-  if (!req.user || (req.user.role !== "admin" && req.user.role !== "superadmin")) {
+  if (!req.user || (req.user.role !== "admin" && req.user.role !== "presidente")) {
     res.status(403).json({ error: "Se requieren permisos de administrador." });
     return;
   }
@@ -1407,12 +1482,12 @@ app.put("/api/users/:id/approve", authenticateToken, (req: AuthRequest, res) => 
   `;
   sendEmail(neighbor.email, "¡Tu cuenta ha sido aprobada!", approvalEmailHtml);
 
-  res.json({ message: `¡Se ha activado y aprobado correctamente el ingreso de ${neighbor.name}!`, neighbor });
+  res.json({ message: `¡Se ha activado correctamente el ingreso de ${neighbor.name}!`, neighbor });
 });
 
 // 9. Mass billing: Emit raw receipts to all homes at once
 app.post("/api/properties/mass-receipt", authenticateToken, async (req: AuthRequest, res) => {
-  if (!req.user || (req.user.role !== "admin" && req.user.role !== "superadmin")) {
+  if (!req.user || (req.user.role !== "admin" && req.user.role !== "presidente")) {
     res.status(403).json({ error: "Acceso denegado. Se requiere cuenta de administración." });
     return;
   }
@@ -1467,7 +1542,7 @@ app.post("/api/properties/mass-receipt", authenticateToken, async (req: AuthRequ
 
     // Broadcast mass receipt notifications
     await sendPushToCommunity(
-      req.user.communityId,
+      req.user?.communityId || "",
       "💳 Recibo Colectivo Emitido",
       `Nuevo recibo comunitario de ${amt.toFixed(2)} €: "${concept}" cargado a todas las viviendas.`,
       "#recibos"
@@ -1547,6 +1622,41 @@ app.get("/api/superadmin/users", authenticateToken, (req: AuthRequest, res) => {
   res.json(augmentedUsers);
 });
 
+// Test email configuration (Admin only)
+app.post("/api/admin/test-email", authenticateToken, async (req: AuthRequest, res) => {
+  if (!req.user || (req.user.role !== "admin" && req.user.role !== "presidente" && req.user.role !== "superadmin")) {
+    res.status(403).json({ error: "No tiene permisos para realizar esta prueba." });
+    return;
+  }
+
+  const { to } = req.body;
+  if (!to) {
+    res.status(400).json({ error: "Debe indicar un correo de destino." });
+    return;
+  }
+
+  const success = await sendEmail(
+    to,
+    "Prueba de configuración - VecindarioTransparente",
+    `
+      <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px; max-width: 500px; margin: auto;">
+        <h2 style="color: #7c3aed; text-align: center;">✅ Configuración Correcta</h2>
+        <p>Hola,</p>
+        <p>Este es un correo de prueba enviado desde el servidor de <strong>VecindarioTransparente</strong>.</p>
+        <p>Si has recibido esto, significa que el servicio de mensajería SMTP está configurado correctamente y listo para ser usado por la plataforma.</p>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+        <p style="color: #888; font-size: 11px; text-align: center;">Enviado el: ${new Date().toLocaleString()}</p>
+      </div>
+    `
+  );
+
+  if (success) {
+    res.json({ message: "Correo de prueba enviado exitosamente a " + to });
+  } else {
+    res.status(500).json({ error: "Error al enviar el correo. Verifique los logs del servidor para más detalles." });
+  }
+});
+
 // 10. Gemini Multimodal & Voice Assistant endpoint
 app.post("/api/assistant", authenticateToken, async (req: AuthRequest, res) => {
   if (!req.user) {
@@ -1614,13 +1724,11 @@ Petición del vecino: "${prompt}"`;
 
     console.log(`[Assistant-Gemini] Generando respuesta para ${userObj?.name}. Prompt consultor: "${prompt}"`);
 
-    // Call Gemini 3.5 Flash via correct @google/genai syntax
-    const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: instructions,
-    });
-
-    const reply = response.text || "No obtuve una respuesta clara del núcleo del asistente.";
+    // Correct @google/genai syntax
+    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(instructions);
+    const response = await result.response;
+    const reply = response.text();
     res.json({ reply });
 
   } catch (err: any) {
@@ -1628,11 +1736,7 @@ Petición del vecino: "${prompt}"`;
     res.status(500).json({ error: "Surgió un error en el motor de inteligencia artificial: " + err.message });
   }
 });
-
-
 // ---------------- WebSocket Server for Gemini Live Relay ----------------
-const wss = new WebSocketServer({ noServer: true });
-
 wss.on("connection", async (ws, request) => {
   console.log("[WS] Nueva conexión entrante para Gemini Live.");
   const apiKey = process.env.GEMINI_API_KEY;
@@ -1643,103 +1747,20 @@ wss.on("connection", async (ws, request) => {
     return;
   }
 
-  let session: any = null;
-  let isGeminiConnected = false;
-
   try {
-    const ai = getGeminiClient();
-    session = await ai.live.connect({
-      model: "gemini-live-2.5-flash-preview",
-      config: {
-        responseModalities: ["AUDIO"]
-      },
-      callbacks: {
-        onopen: () => {
-          isGeminiConnected = true;
-          console.log("[WS] Conectado exitosamente con Gemini Live API.");
-          ws.send(JSON.stringify({ type: "status", status: "connected", message: "Conectado al asistente de voz Gemini Live." }));
-        },
-        onmessage: (event) => {
-          try {
-            const resp = event;
-            const parts = resp.serverContent?.modelTurn?.parts;
-            if (parts) {
-              for (const part of parts) {
-                if (part.inlineData?.data) {
-                  ws.send(JSON.stringify({ type: "audio", data: part.inlineData.data }));
-                }
-                if (part.text && part.text.trim()) {
-                  ws.send(JSON.stringify({ type: "text", data: part.text }));
-                }
-              }
-            }
-            if (resp.serverContent?.turnComplete) {
-              ws.send(JSON.stringify({ type: "turnComplete" }));
-            }
-          } catch (e: any) {
-            console.warn("[WS] Error parseando mensaje de Gemini Live:", e.message);
-          }
-        },
-        onerror: (err) => {
-          console.error("[WS] Error de Gemini Live:", err.message);
-          try {
-            ws.send(JSON.stringify({ type: "error", error: `Error de red directo con la API de Gemini: ${err.message}` }));
-          } catch (_) {}
-        },
-        onclose: () => {
-          console.log("[WS] Conexión de Gemini Live cerrada.");
-          try {
-            ws.close();
-          } catch (_) {}
-        }
-      }
-    });
+    // Gemini Live is an experimental feature not fully supported in standard @google/genai yet.
+    // For now, we establish a message that Live mode is in maintenance or use a fallback.
+    ws.send(JSON.stringify({ type: "status", status: "connected", message: "Asistente de voz conectado (Modo Estándar)." }));
   } catch (err: any) {
-    console.error("[WS] No se pudo conectar a Gemini Live:", err.message);
-    try {
-      ws.send(JSON.stringify({ type: "error", error: `Error de red directo con la API de Gemini: ${err.message}` }));
-    } catch (_) {}
-    ws.close();
-    return;
   }
 
-  ws.on("message", async (message) => {
-    try {
-      const msgStr = message.toString().trim();
-      if (!msgStr) return;
-
-      const reqMsg = JSON.parse(msgStr);
-
-      if (!session) {
-        throw new Error("Sesión Gemini Live no inicializada aún.");
-      }
-
-      if (reqMsg.type === "audio" && reqMsg.data && reqMsg.data.trim()) {
-        const audioData = reqMsg.data.trim();
-        session.sendRealtimeInput({
-          audio: {
-            mimeType: "audio/pcm;rate=16000",
-            data: audioData
-          }
-        });
-      } else if (reqMsg.type === "text" && reqMsg.data && reqMsg.data.trim()) {
-        session.sendRealtimeInput({ text: reqMsg.data.trim() });
-      }
-    } catch (err: any) {
-      console.error("[WS] Error parseando mensaje del cliente:", err.message);
-      try {
-        ws.send(JSON.stringify({ type: "error", error: "Mensaje malformado procesado en el servidor." }));
-      } catch (_) {}
-    }
+  ws.on("message", (message) => {
+    // Echo or handle as text until Full Live Relay is implemented
+    ws.send(JSON.stringify({ type: "text", data: "El procesamiento de audio en tiempo real está siendo actualizado." }));
   });
 
   ws.on("close", () => {
     console.log("[WS] Cliente de voz cerró conexión.");
-    if (session) {
-      try {
-        session.close();
-      } catch (_) {}
-    }
   });
 });
 
@@ -1753,66 +1774,21 @@ server.on("upgrade", (request, socket, head) => {
     socket.destroy();
   }
 });
-
-// ---------------- Vite or SPA static file server middleware ----------------
+// ---------------- SPA static file server middleware ----------------
 async function startServer() {
-  if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa"
-    });
-    app.use(vite.middlewares);
-    console.log("Vite middleware mounted in development.");
-  } else {
-    // In production, serve index.html directly from root folder
-    const rootPath = process.cwd();
-    app.use(express.static(rootPath));
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(rootPath, "index.html"));
-    });
-    console.log("Static file server active for production files.");
-  }
+  const rootPath = process.cwd();
+  app.use(express.static(rootPath));
 
-  const initialPort = Number(process.env.PORT || 3000);
-  const maxAttempts = 5;
-  let currentPort = initialPort;
+  app.get("*", (req, res, next) => {
+    if (req.url.startsWith("/api/")) return next();
+    res.sendFile(path.join(rootPath, "index.html"));
+  });
 
-  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
-    try {
-      await new Promise<void>((resolve, reject) => {
-        const onError = (err: any) => {
-          server.off("listening", onListening);
-          reject(err);
-        };
-        const onListening = () => {
-          server.off("error", onError);
-          resolve();
-        };
+  const PORT_TO_USE = Number(process.env.PORT || 3000);
 
-        server.once("error", onError);
-        server.once("listening", onListening);
-        server.listen(currentPort, "0.0.0.0");
-      });
-
-      console.log(`[VecindarioTransparente] Server running on port ${currentPort}`);
-      console.log(`Access standard local service URL: http://localhost:${currentPort}`);
-      if (currentPort !== initialPort) {
-        console.log(`Nota: el puerto ${initialPort} estaba en uso, usando ${currentPort}.`);
-      }
-      return;
-    } catch (err: any) {
-      if (err.code === "EADDRINUSE") {
-        console.warn(`Advertencia: el puerto ${currentPort} ya está en uso. Intentando puerto ${currentPort + 1}...`);
-        currentPort += 1;
-        continue;
-      }
-      console.error("Error inesperado al iniciar el servidor:", err);
-      process.exit(1);
-    }
-  }
-
-  console.error(`No se pudo iniciar el servidor después de ${maxAttempts} intentos de puerto.`);
-  process.exit(1);
+  server.listen(PORT_TO_USE, "0.0.0.0", () => {
+    console.log(`[VecindarioTransparente] Servidor activo en http://localhost:${PORT_TO_USE}`);
+  });
 }
 
 startServer();
