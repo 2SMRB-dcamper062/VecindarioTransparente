@@ -1,7 +1,7 @@
 # VecindarioTransparente 🏡
 
 <p align="center">
-  <img src="favicon.png" alt="VecindarioTransparente Logo" width="120" height="120">
+  <img src="/assets/logo.png.png" alt="VecindarioTransparente Logo" width="200" height="200">
 </p>
 
 ## 📄 Descripción de la Aplicación
