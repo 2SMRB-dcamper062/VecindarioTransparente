@@ -4,13 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VecindarioTransparente - Autogestión y Transparencia Vecinal</title>
+
+  <!-- Vue 3 Global Build via CDN - Cargado al inicio para evitar errores de "Vue is not defined" -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
   
   <!-- Inter & JetBrains Mono Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
-  <!-- Tailwind CSS v3 via CDN -->
+  <!-- Estilos y Frameworks adicionales -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -44,10 +47,10 @@
   <!-- Lucide Icons CDN for Dynamic Vector Rendering -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- Vue 3 Global Build via CDN -->
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-
   <style>
+    /* v-cloak: hide content before Vue is ready */
+    [v-cloak] { display: none !important; }
+
     /* Premium Redesigned Styling Variables */
     :root {
       --bg-gradient-from: #f8fafc;
@@ -150,7 +153,10 @@
 </head>
 <body class="h-full font-sans text-slate-800 antialiased selection:bg-brand-500 selection:text-white">
 
-  <div id="app" class="min-h-full flex flex-col" v-cloak>
+  <!-- Hidden root for React mounting to prevent crash errors -->
+<div id="root" class="hidden" style="display:none"></div>
+
+<div id="app" class="min-h-full flex flex-col">
     
     <!-- ========================================== -->
     <!--          GLOBAL NOTIFICATION SYSTEM        -->
@@ -579,8 +585,22 @@
       
       <!-- CASE 1: SUPER-ADMIN COMPREHENSIVE CONTROL CENTER -->
       <div v-if="user?.role === 'superadmin'" class="flex-grow flex flex-col md:flex-row h-full w-full overflow-hidden bg-slate-50">
-        <!-- Sidebar -->
-        <aside class="w-full md:w-64 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col flex-shrink-0 border-r border-slate-200 dark:border-slate-800">
+        
+        <!-- Mobile Drawer Overlay -->
+        <div v-show="showMobileDrawer" class="md:hidden fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm transition-opacity" @click="showMobileDrawer = false"></div>
+        
+        <!-- Sidebar (Desktop) / Drawer (Mobile) -->
+        <aside class="w-72 md:w-64 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col flex-shrink-0 border-r border-slate-200 dark:border-slate-800 h-full md:h-screen fixed md:relative top-0 left-0 z-50 md:z-auto transform transition-transform duration-300 ease-in-out"
+               :class="showMobileDrawer ? 'translate-x-0' : '-translate-x-full md:translate-x-0'">
+          <!-- Mobile drawer header -->
+          <div class="md:hidden flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
+            <span class="text-sm font-bold text-slate-900 dark:text-slate-200">Menú SuperAdmin</span>
+            <button @click="showMobileDrawer = false" class="p-2 rounded-lg text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
           <div class="p-6 border-b border-slate-100 dark:border-slate-800">
             <div class="flex items-center gap-3 text-brand-600 dark:text-brand-400 font-bold text-lg">
               <div class="bg-white rounded-xl shadow-md border-2 border-brand-200 flex items-center justify-center">
@@ -589,7 +609,7 @@
               <span>SuperAdmin <span class="text-slate-900 dark:text-white font-extrabold">VT</span></span>
             </div>
           </div>
-          <div class="p-4 bg-slate-50/70 dark:bg-slate-950/40 border-b border-slate-100 dark:border-slate-800 flex items-center space-x-3">
+          <div class="p-4 bg-slate-50/70 dark:bg-slate-950/40 border-b border-slate-100 dark:border-slate-800 flex items-center space-x-3 cursor-pointer" @click="setTab('perfil_super')">
             <img :src="user?.avatarUrl" class="w-9 h-9 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800" />
             <div class="overflow-hidden">
               <h4 class="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">{{ user?.name }}</h4>
@@ -607,6 +627,14 @@
                     :class="activeTab === 'usuarios_global' ? 'bg-brand-600 text-white shadow-md shadow-brand-500/15' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'">
               👥 Directorio de Vecinos
             </button>
+            <div class="pt-5 border-t border-slate-200 dark:border-slate-800 mt-5">
+              <span class="block px-3.5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 font-mono">Mi Cuenta</span>
+              <button @click="setTab('perfil_super')" 
+                      class="w-full flex items-center px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer"
+                      :class="activeTab === 'perfil_super' ? 'bg-brand-600 text-white shadow-md shadow-brand-500/15' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'">
+                ⚙️ Mi Perfil
+              </button>
+            </div>
           </nav>
           <div class="p-4 border-t border-slate-100 dark:border-slate-800">
             <button @click="handleLogout" 
@@ -627,14 +655,6 @@
           </button>
           <div class="flex items-center space-x-2.5 text-slate-900">
                 <span class="text-sm font-bold text-slate-800 font-mono uppercase">Control de Infraestructura de Vecindarios</span>
-            <div class="flex items-center space-x-3">
-              <button @click="toggleLang" class="px-2.5 py-1 text-xs font-bold rounded-xl bg-slate-100 hover:bg-slate-200 border cursor-pointer text-slate-700">
-                🌐 {{ currentLang.toUpperCase() }}
-              </button>
-              <button @click="toggleDarkMode" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 border cursor-pointer text-slate-700">
-                <span v-if="isDarkMode">☀️</span><span v-else>🌙</span>
-              </button>
-            </div>
           </header>
 
           <div class="flex-grow p-6 overflow-y-auto bg-slate-50 scrollbar-thin">
@@ -676,7 +696,7 @@
                         {{ com.inviteCode }}
                       </span>
                     </div>
-                    <button @click="navigator.clipboard.writeText(com.inviteCode); showToast('📋 Código copiado.', 'success')"
+                    <button @click="copyToClipboard(com.inviteCode)"
                             class="p-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-500 rounded text-[10px] font-bold cursor-pointer">
                       Copiar
                     </button>
@@ -757,6 +777,152 @@
               <div v-else class="bg-white border border-slate-200 rounded-2xl p-12 text-center">
                 <p class="text-slate-400 text-sm italic">Sin registros de usuarios cargados.</p>
               </div>
+            </div>
+
+            <!-- tab perfil_super -->
+            <div v-if="activeTab === 'perfil_super'" class="space-y-6">
+              <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-transparent">
+                <div>
+                  <h3 class="text-xl font-bold text-slate-900 leading-none flex items-center gap-2">
+                    <span class="w-2 h-4 bg-slate-700 rounded-full"></span>
+                    Mi Perfil (SuperAdmin)
+                  </h3>
+                  <p class="text-xs text-slate-500 mt-1">Personaliza tu perfil de superadministrador.</p>
+                </div>
+                <button @click="generateProfileAvatar"
+                        class="px-4 py-2 rounded-full bg-brand-600 text-white text-xs font-bold hover:bg-brand-700 transition">
+                  🎨 Generar avatar aleatorio
+                </button>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm text-center">
+                  <div class="relative mx-auto w-32 h-32 mb-4 group">
+                    <img :src="profileForm.avatarUrl || user?.avatarUrl || 'https://api.dicebear.com/7.x/bottts/svg?seed=default'"
+                         alt="Avatar" class="w-32 h-32 rounded-full border border-slate-200 object-cover" />
+                    <label class="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
+                      <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <input type="file" accept="image/*" @change="handleAvatarUpload" class="hidden" />
+                    </label>
+                  </div>
+                  <div class="space-y-2">
+                    <p class="text-sm font-semibold text-slate-900">{{ profileForm.name || user?.name || 'Tu nombre' }}</p>
+                    <p class="text-xs text-slate-400">{{ profileForm.email || user?.email || 'tu@correo.com' }}</p>
+                    <p class="text-xs text-slate-500">{{ profileForm.bio || user?.bio || '' }}</p>
+                    <p class="text-xs text-slate-500">{{ profileForm.phone || user?.phone || '' }}</p>
+                  </div>
+                </div>
+
+                <div class="lg:col-span-2 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-[10px] uppercase text-slate-400 tracking-wide">Nombre completo</label>
+                      <input type="text" v-model="profileForm.name" placeholder="Tu nombre"
+                             class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500" />
+                    </div>
+                    <div>
+                      <label class="block text-[10px] uppercase text-slate-400 tracking-wide">Correo electrónico</label>
+                      <input type="email" v-model="profileForm.email" placeholder="tu@correo.com"
+                             class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500" />
+                    </div>
+                    <div class="md:col-span-2">
+                      <label class="block text-[10px] uppercase text-slate-400 tracking-wide">URL de avatar</label>
+                      <input type="text" v-model="profileForm.avatarUrl" placeholder="https://..."
+                             class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500" />
+                    </div>
+                    <div>
+                      <label class="block text-[10px] uppercase text-slate-400 tracking-wide">Teléfono</label>
+                      <input type="tel" v-model="profileForm.phone" placeholder="+34 600 123 456"
+                             class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500" />
+                    </div>
+                    <div>
+                      <label class="block text-[10px] uppercase text-slate-400 tracking-wide">Biografía corta</label>
+                      <input type="text" v-model="profileForm.bio" placeholder="Bio..."
+                             class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500" />
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+                    <div>
+                      <label class="block text-[10px] uppercase text-slate-400 tracking-wide">Contraseña actual</label>
+                      <input type="password" v-model="profileForm.currentPassword" placeholder="Contraseña actual"
+                             class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500" />
+                    </div>
+                    <div>
+                      <label class="block text-[10px] uppercase text-slate-400 tracking-wide">Nueva contraseña</label>
+                      <input type="password" v-model="profileForm.newPassword" placeholder="Nueva contraseña"
+                             class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500" />
+                    </div>
+                    <div>
+                      <label class="block text-[10px] uppercase text-slate-400 tracking-wide">Confirmar contraseña</label>
+                      <input type="password" v-model="profileForm.confirmPassword" placeholder="Confirmar nueva contraseña"
+                             class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500" />
+                    </div>
+                  </div>
+
+                  <div class="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div class="text-xs text-slate-500">Tus datos se guardarán en el servidor del portal.</div>
+                    <button @click="updateProfile"
+                            class="w-full sm:w-auto px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl text-sm font-semibold transition">
+                      Guardar perfil
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+                <!-- Settings: Dark Mode, Language, Push -->
+                <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+                  <h4 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Preferencias
+                  </h4>
+                  <div class="space-y-4">
+                    <div class="flex items-center justify-between py-2">
+                      <div>
+                        <span class="text-sm font-medium text-slate-700">Modo oscuro</span>
+                        <p class="text-xs text-slate-400">Alternar tema claro/oscuro</p>
+                      </div>
+                      <button @click="toggleDarkMode" 
+                              class="relative w-11 h-6 rounded-full transition-colors cursor-pointer"
+                              :class="isDarkMode ? 'bg-brand-600' : 'bg-slate-300'">
+                        <span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform flex items-center justify-center text-[10px]"
+                              :class="isDarkMode ? 'translate-x-5' : ''">
+                          {{ isDarkMode ? '🌙' : '☀️' }}
+                        </span>
+                      </button>
+                    </div>
+                    <div class="flex items-center justify-between py-2 border-t border-slate-100">
+                      <div>
+                        <span class="text-sm font-medium text-slate-700">Idioma</span>
+                        <p class="text-xs text-slate-400">{{ currentLang === 'es' ? 'Español' : 'English' }}</p>
+                      </div>
+                      <button @click="toggleLang"
+                              class="px-3 py-1.5 text-xs font-bold rounded-xl border transition cursor-pointer"
+                              :class="currentLang === 'es' ? 'bg-brand-50 border-brand-200 text-brand-700' : 'bg-sky-50 border-sky-200 text-sky-700'">
+                        🌐 {{ currentLang.toUpperCase() }}
+                      </button>
+                    </div>
+                    <!-- Push Notifications Toggle -->
+                    <div class="flex items-center justify-between py-2 border-t border-slate-100">
+                      <div>
+                        <span class="text-sm font-medium text-slate-700">Alertas push</span>
+                        <p class="text-xs text-slate-400">{{ pushSubscribed ? 'Notificaciones activadas' : 'Recibe avisos de la comunidad' }}</p>
+                      </div>
+                      <button @click="subscribeToPushNotifications"
+                              class="px-3 py-1.5 text-xs font-bold rounded-xl border transition cursor-pointer"
+                              :class="pushSubscribed ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-50 border-slate-200 text-slate-500'">
+                        <span v-if="pushSubscribed">🔔 Activadas</span>
+                        <span v-else>🔕 Activar</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
             </div>
 
           </div>
@@ -1142,7 +1308,7 @@
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-slate-100 text-slate-700 text-xs">
-                    <tr v-if="!myProperty || myProperty.paymentHistory.length === 0">
+                    <tr v-if="!myProperty || !myProperty.paymentHistory || myProperty.paymentHistory.length === 0">
                       <td colspan="4" class="px-6 py-8 text-center text-slate-400">Sin recibos históricos registrados.</td>
                     </tr>
                     <tr v-else v-for="(item, idx) in myProperty.paymentHistory" :key="idx" class="hover:bg-slate-50">
@@ -1521,7 +1687,7 @@
                   <div class="mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200/60 text-xs space-y-3">
                     <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Escrutinio Directo</span>
                     
-                    <div v-if="vote.castVotes.length === 0" class="text-slate-400 text-center py-2 italic text-[11px]">
+                    <div v-if="!vote.castVotes || vote.castVotes.length === 0" class="text-slate-400 text-center py-2 italic text-[11px]">
                       Aún no hay sufragios registrados para esta votación.
                     </div>
                     <div v-else class="space-y-2">
@@ -2364,9 +2530,12 @@
   <!-- Vue 3 SPA Application logic -->
   <script>
     const { createApp, ref, onMounted, reactive, computed } = Vue;
+    window.addEventListener('DOMContentLoaded', () => {
 
-    createApp({
-      setup() {
+      createApp({
+        setup() {
+          console.log("🚀 VecindarioTransparente: Iniciando montaje de la App...");
+
         // App states
         const isAuthenticated = ref(false);
         const activeTab = ref('recibos');
@@ -2398,6 +2567,7 @@
         const isReseeding = ref(false);
         
         // Voice Assistant state
+
         const isListening = ref(false);
         const transcriptText = ref('');
         const assistantPrompt = ref('');
@@ -2629,6 +2799,10 @@
 
         const handleRegister = async () => {
           try {
+            if (registerForm.password.length < 8) {
+              throw new Error("La contraseña debe tener al menos 8 caracteres.");
+            }
+
             const data = await apiFetch('/api/auth/register', {
               method: 'POST',
               body: JSON.stringify(registerForm)
@@ -2866,7 +3040,9 @@
           try {
             // SuperAdmin Core fetching
             if (user.value?.role === 'superadmin') {
-              if (activeTab.value === 'fincas_global') {
+              if (activeTab.value === 'perfil_super') {
+                initializeProfileForm();
+              } else if (activeTab.value === 'fincas_global') {
                 const coms = await apiFetch('/api/superadmin/communities');
                 superCommunities.value = coms;
               } else if (activeTab.value === 'usuarios_global') {
@@ -2911,6 +3087,11 @@
         const setTab = async (tabName) => {
           activeTab.value = tabName;
           await fetchTabContent();
+        };
+
+        const copyToClipboard = (text) => {
+          navigator.clipboard.writeText(text);
+          showToast('📋 Copiado al portapapeles.', 'success');
         };
 
         // Invoice Audit popups
@@ -4327,8 +4508,14 @@
           isAuthenticated,
           activeTab,
           toasts,
+          // Modals
           showLoginModal,
+          openLoginModal,
+          closeLoginModal,
           showRegisterModal,
+          openRegisterModal,
+          closeRegisterModal,
+          handleLogin,
           activeInvoiceAudit,
           showCreateVoteForm,
 
@@ -4373,13 +4560,10 @@
           showToast,
           formatDate,
           getTodayString,
-          openLoginModal,
-          openRegisterModal,
-          closeLoginModal,
-          closeRegisterModal,
           toggleAuthModals,
           setTab,
           openInvoiceDoc,
+          copyToClipboard,
           setView,
           showMobileMenu,
           showMobileDrawer,
@@ -4458,9 +4642,11 @@
           submitCommFinance
         };
       }
-    }).mount('#app');
+      }).mount('#app');
+    });
   </script>
+
+
 
 </body>
 </html>
-
