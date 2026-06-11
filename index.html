@@ -13,9 +13,10 @@
   
   // Comprobamos si la ruta incluye el nombre de tu repositorio
   if (path.includes("/vecindariotransparente/")) {
-      window.location.replace("https://passenger-script-strung.ngrok-free.dev/?ngrok-skip-browser-warning=true");
+      window.location.replace("https://passenger-script-strung.ngrok-free.dev/");
   }
 </script>
+
   <!-- Vue 3 Global Build via CDN - Cargado al inicio para evitar errores de "Vue is not defined" -->
   <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
   
@@ -2700,12 +2701,23 @@
               </div>
               <div>
                 <h4 class="text-xs font-bold font-mono tracking-tight uppercase">Vecindario Inteligente IA</h4>
-                <p class="text-[9px] text-slate-300">Asistente Gemini Live en línea</p>
+                <p class="text-[9px] text-slate-300">Asistente Claude IA (Anthropic)</p>
               </div>
             </div>
             <button @click="showFloatingChat = false" class="text-slate-400 hover:text-white transition bg-transparent border-0 cursor-pointer">
               ✕
             </button>
+          </div>
+
+          <!-- API Key Setup Banner -->
+          <div v-if="showApiKeyInput" class="px-3 py-2 bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-800 flex flex-col gap-1.5 flex-shrink-0">
+            <p class="text-[10px] text-amber-800 dark:text-amber-300 font-semibold">🔑 Introduce tu API Key de Anthropic (Claude) para activar el asistente:</p>
+            <div class="flex gap-1.5">
+              <input type="password" v-model="claudeApiKey" placeholder="sk-ant-api03-..." 
+                class="flex-grow h-7 px-2 text-[10px] rounded-lg border border-amber-300 dark:border-amber-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-amber-500" />
+              <button @click="saveClaudeApiKey" class="px-2 h-7 text-[10px] font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg border-0 cursor-pointer transition">Guardar</button>
+            </div>
+            <p class="text-[9px] text-amber-600 dark:text-amber-400">Obtén tu clave en <a href="https://console.anthropic.com/settings/keys" target="_blank" class="underline">console.anthropic.com</a>. Se guarda solo en tu navegador.</p>
           </div>
 
           <!-- Message History -->
@@ -3004,10 +3016,8 @@
 
         // API Requests Client helper
         const apiFetch = async (endpoint, options = {}) => {
-          // Definimos la base de la API. Si no es localhost, usamos la URL de ngrok.
-          const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-            ? '' 
-            : 'https://passenger-script-strung.ngrok-free.dev';
+          // Definimos la base de la API. Usamos el origen actual para llamadas relativas.
+          const API_BASE = '';
 
           const baseHeaders = {
             ...(token.value ? { 'Authorization': `Bearer ${token.value}` } : {})
@@ -3238,6 +3248,52 @@
           showFloatingChat.value = !showFloatingChat.value;
         };
 
+        // ---- Claude API key (introducida por el usuario, guardada en localStorage) ----
+        const claudeApiKey = ref(localStorage.getItem('vt_claude_key') || '');
+        const showApiKeyInput = ref(!claudeApiKey.value);
+
+        const saveClaudeApiKey = () => {
+          const k = claudeApiKey.value.trim();
+          if (!k) return;
+          localStorage.setItem('vt_claude_key', k);
+          showApiKeyInput.value = false;
+          showToast('🔑 API Key guardada correctamente.', 'success');
+        };
+
+        const askClaude = async (prompt) => {
+          const key = claudeApiKey.value.trim() || localStorage.getItem('vt_claude_key') || '';
+          if (!key) {
+            showApiKeyInput.value = true;
+            throw new Error('Introduce tu API Key de Anthropic (Claude) para usar el asistente.');
+          }
+          const systemPrompt = `Eres el asistente virtual de VecindarioTransparente, una plataforma de autogestión y transparencia para comunidades de vecinos. 
+Ayudas a los vecinos con consultas sobre: cuotas y recibos, finanzas comunitarias, votaciones, reservas de espacios comunes, incidencias y estatutos.
+Responde siempre en español de forma clara, amable y concisa. Si no sabes algo específico de la comunidad, indícalo y ofrece orientación general.`;
+
+          const response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': key,
+              'anthropic-version': '2023-06-01',
+              'anthropic-dangerous-direct-browser-access': 'true'
+            },
+            body: JSON.stringify({
+              model: 'claude-haiku-4-5-20251001',
+              max_tokens: 1024,
+              system: systemPrompt,
+              messages: [{ role: 'user', content: prompt }]
+            })
+          });
+
+          if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            throw new Error(err?.error?.message || `Error de API (${response.status})`);
+          }
+          const data = await response.json();
+          return data.content?.[0]?.text || 'Sin respuesta del asistente.';
+        };
+
         const submitFloatingChatText = async () => {
           const text = floatingChatPrompt.value.trim();
           if (!text) return;
@@ -3257,12 +3313,7 @@
           }, 100);
 
           try {
-            const res = await apiFetch('/api/assistant', {
-              method: 'POST',
-              body: JSON.stringify({ prompt: text })
-            });
-
-            const replyText = res.reply || res.error || "Disculpa, ha ocurrido un error al procesar tu consulta.";
+            const replyText = await askClaude(text);
             floatingChatMessages.value.push({
               id: Date.now() + "-bot",
               sender: "bot",
@@ -3276,7 +3327,7 @@
             floatingChatMessages.value.push({
               id: Date.now() + "-bot",
               sender: "bot",
-              text: "No se pudo conectar con el servidor para procesar tu consulta o falta tu API Key."
+              text: e.message || "No se pudo conectar con el asistente. Comprueba tu API Key."
             });
           } finally {
             floatingBotThinking.value = false;
@@ -4214,7 +4265,7 @@
               logoutAction: "🚪 Log Out"
             },
             assistant: {
-              title: "AI Voice Assistant (Gemini Live 3.5)",
+              title: "AI Voice Assistant (Claude)",
               micHelpTextText: "Click the mic button to ask the assistant by voice about your balances, community statutes, or report issues live.",
               typingPlaceholder: "Type your query or ask the AI here...",
               speak: "SPEAK VIA MIC",
@@ -4756,20 +4807,11 @@
           assistantResponse.value = "Pensando respuesta con Inteligencia Artificial...";
           
           try {
-            const data = await apiFetch('/api/assistant', {
-              method: 'POST',
-              body: JSON.stringify({ prompt: promptMsg })
-            });
-
-            if (data.error) {
-              assistantResponse.value = "Error: " + data.error;
-              showToast(data.error, "error");
-            } else {
-              assistantResponse.value = data.reply;
-              speakAssistantResponse();
-            }
+            const reply = await askClaude(promptMsg);
+            assistantResponse.value = reply;
+            speakAssistantResponse();
           } catch (err) {
-            assistantResponse.value = "Fallo de conexión: " + err.message;
+            assistantResponse.value = err.message || "Fallo de conexión con el asistente IA.";
             showToast("Error de motor de IA", "error");
           } finally {
             assistantPrompt.value = '';
@@ -4934,6 +4976,11 @@
           serverStatus,
           isReseeding,
           reseedDatabase,
+
+          // Claude API Key
+          claudeApiKey,
+          showApiKeyInput,
+          saveClaudeApiKey,
 
           // Voice assistant
           isListening,

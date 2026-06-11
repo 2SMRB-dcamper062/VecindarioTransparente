@@ -1725,11 +1725,12 @@ Petición del vecino: "${prompt}"`;
     console.log(`[Assistant-Gemini] Generando respuesta para ${userObj?.name}. Prompt consultor: "${prompt}"`);
 
     // Correct @google/genai syntax
-    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const result = await model.generateContent(instructions);
-    const response = await result.response;
-    const reply = response.text();
-    res.json({ reply });
+    const result = await ai.models.generateContent({
+      model: "gemini-1.5-flash",
+      contents: instructions
+    });
+    const text = result.text ? result.text() : "";
+    res.json({ reply: text });
 
   } catch (err: any) {
     console.error("[Assistant-Gemini] Error al procesar consulta:", err.message);
