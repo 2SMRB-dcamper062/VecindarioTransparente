@@ -62,6 +62,33 @@
     /* v-cloak: hide content before Vue is ready */
     [v-cloak] { display: none !important; }
 
+    /* Loading splash screen */
+    #app-loading {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      transition: opacity 0.3s ease;
+    }
+    #app-loading.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    #app-loading .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #ede9fe;
+      border-top-color: #7c3aed;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     /* Premium Redesigned Styling Variables */
     :root {
       --bg-gradient-from: #f8fafc;
@@ -167,7 +194,13 @@
   <!-- Hidden root for React mounting to prevent crash errors -->
 <div id="root" class="hidden" style="display:none"></div>
 
-<div id="app" class="min-h-full flex flex-col">
+<!-- Loading splash: visible until Vue mounts -->
+<div id="app-loading">
+  <div class="spinner"></div>
+  <span style="font-family:Inter,sans-serif;font-size:0.9rem;color:#64748b;font-weight:500;">Cargando VecindarioTransparente...</span>
+</div>
+
+<div id="app" v-cloak class="min-h-full flex flex-col">
     
     <!-- ========================================== -->
     <!--          GLOBAL NOTIFICATION SYSTEM        -->
@@ -4768,6 +4801,11 @@
 
         // Lifecycle mounting checklist
         onMounted(async () => {
+          // Hide loading splash now that Vue is mounted
+          const splash = document.getElementById('app-loading');
+          if (splash) splash.classList.add('hidden');
+          setTimeout(() => { if (splash) splash.remove(); }, 350);
+
           // Check for language & theme triggers
           const cachedLang = localStorage.getItem('vt_lang');
           if (cachedLang) currentLang.value = cachedLang;
