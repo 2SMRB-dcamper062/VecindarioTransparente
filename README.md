@@ -40,9 +40,9 @@ El desarrollo del frontend aprovecha un stack moderno, ágil y de alto rendimien
 Sigue estos pasos para clonar el repositorio, configurar el entorno local y arrancar el servidor de desarrollo en tu máquina:
 
 1. **Clonar el repositorio:**
-   ```bash
-   git clone [https://github.com/tu-usuario/vecindariotransparente.git](https://github.com/tu-usuario/vecindariotransparente.git)
-   cd vecindariotransparente
+```bash
+git clone https://github.com/tu-usuario/vecindariotransparente.git
+cd vecindariotransparente
 
 2. **Instalar las dependencias:**
 ```bash
