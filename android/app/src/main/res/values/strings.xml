@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">VecindarioTransparente</string>
+    <string name="title_activity_main">VecindarioTransparente</string>
+    <string name="package_name">com.vecindariotransparente.app</string>
+    <string name="custom_url_scheme">com.vecindariotransparente.app</string>
+</resources>
