@@ -36,6 +36,7 @@
     "ws": "^8.21.0"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",
     "@types/express": "^4.17.21",

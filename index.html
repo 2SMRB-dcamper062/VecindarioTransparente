@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VecindarioTransparente - Autogestión y Transparencia Vecinal</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
   
 <script type="text/javascript">
   // Convertimos la ruta actual a minúsculas para comparar sin errores
@@ -2969,6 +2970,11 @@
 
         // API Requests Client helper
         const apiFetch = async (endpoint, options = {}) => {
+          // Definimos la base de la API. Si no es localhost, usamos la URL de ngrok.
+          const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+            ? '' 
+            : 'https://passenger-script-strung.ngrok-free.dev';
+
           const baseHeaders = {
             ...(token.value ? { 'Authorization': `Bearer ${token.value}` } : {})
           };
@@ -2983,7 +2989,9 @@
           };
 
           try {
-            const response = await fetch(endpoint, config);
+            // Construimos la URL completa si el endpoint es relativo
+            const url = endpoint.startsWith('http') ? endpoint : `${API_BASE}${endpoint}`;
+            const response = await fetch(url, config);
             if (!response.ok) {
               const errorText = await response.text();
               throw new Error(`Error en el servidor (${response.status}): ${errorText}`);
