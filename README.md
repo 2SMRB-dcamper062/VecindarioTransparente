@@ -1,10 +1,10 @@
 # VecindarioTransparente 🏡
 
 <p align="center">
-  <img src="/assets/logo.png.png" alt="VecindarioTransparente Logo" width="200" height="200">
+  <img src="/assets/logo.png" alt="VecindarioTransparente Logo" width="200" height="200">
 </p>
 
-## 📄 Descripción de la Aplicación
+## 📄 Descripción
 
 **VecindarioTransparente** es una plataforma web moderna e interactiva diseñada para la autogestión, digitalización y transparencia total de comunidades de propietarios (propiedad horizontal). Estructurada como una SPA (Single Page Application) reactiva, esta aplicación centraliza la administración de finanzas, la toma de decisiones democráticas, el reporte de incidencias y la reserva de áreas comunes en un único panel visual e intuitivo, eliminando las fricciones y la opacidad tradicionales en la gestión vecinal.
 
@@ -41,15 +41,12 @@ Sigue estos pasos para clonar el repositorio, configurar el entorno local y arra
 
 1. **Clonar el repositorio:**
    ```bash
-   git clone [https://github.com/tu-usuario/vecindariotransparente.git]
+   git clone [https://github.com/tu-usuario/vecindariotransparente.git](https://github.com/tu-usuario/vecindariotransparente.git)
    cd vecindariotransparente
-
-```
 
 2. **Instalar las dependencias:**
 ```bash
 npm install
-
 ```
 
 3. **Iniciar el servidor de desarrollo:**
@@ -62,7 +59,6 @@ npm run dev
 Abre tu navegador de preferencia e ingresa a la siguiente URL local:
 ```text
 http://localhost:3000
-
 ```
 
 <div align="center" style="margin-top: 2rem; border-top: 1px solid #e2e8f0; padding-top: 1.5rem;">
