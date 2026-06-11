@@ -45,6 +45,7 @@ git clone https://github.com/tu-usuario/vecindariotransparente.git
 cd vecindariotransparente
 ```
 
+
 2. **Instalar las dependencias:**
 ```bash
 npm install
