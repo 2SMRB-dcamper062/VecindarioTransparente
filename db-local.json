@@ -273,6 +273,24 @@
       ],
       "userId": "user_xzochxt",
       "communityId": "com_o07wv7x"
+    },
+    {
+      "_id": "prop_fz1yc7a",
+      "block": "d",
+      "floor": "4º",
+      "door": "a",
+      "balanceStatus": "al_dia",
+      "pendingAmount": 0,
+      "paymentHistory": [
+        {
+          "date": "2026-06-11",
+          "amount": 0,
+          "concept": "Matrícula de Alta de Vecino en espera de aprobación",
+          "status": "pagado"
+        }
+      ],
+      "userId": "user_za876fi",
+      "communityId": "comm_demo"
     }
   ],
   "votes": [
